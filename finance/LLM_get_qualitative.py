@@ -19,7 +19,7 @@ def get_company_data(ticker):
     """
     load_dotenv()
     api_key_polygon = os.getenv('POLYGON_API_KEY')
-    news_url = f"https://api.polygon.io/v2/reference/news?ticker={ticker}&limit=6&apiKey={api_key_polygon}"
+    news_url = f"https://api.polygon.io/v2/reference/news?ticker={ticker}&limit=1&apiKey={api_key_polygon}"
     news = requests.get(news_url).json().get('results')
     articles_info = {}
     for index, news_dict in enumerate(news):
@@ -31,7 +31,7 @@ def get_company_data(ticker):
     return articles_info
 
 
-def extract_businees_info(company_ticker):
+def extract_business_info(company_ticker):
    """
    Extract strategic elements from company info dictionary
 

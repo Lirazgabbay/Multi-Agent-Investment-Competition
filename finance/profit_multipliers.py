@@ -2,7 +2,7 @@ import yfinance as yf
 """
     profit_multipliers.py - Functions to calculate profit multipliers for a company ticker symbol.
 """
-def price_sales_ratio(symbol: str) -> float | None:
+def price_sales_ratio(symbol: str):
     """
     Calculate Price/Sales ratio (Price divided by Total Revenue).
     Args:
@@ -25,13 +25,13 @@ def price_sales_ratio(symbol: str) -> float | None:
             return None
         
         price_sales = price / total_revenue
-        return price_sales
+        return str(price_sales)
     except Exception as e:
         print(f"Error calculating Price-to-Sales ratio for {symbol}: {e}")
         return None
 
 
-def price_to_EBIT_ratio(symbol: str) -> float | None:
+def price_to_EBIT_ratio(symbol: str):
     """
     Calculate Price/EBIT ratio (Price divided by Earnings Before Interest and Taxes).
     
@@ -49,13 +49,13 @@ def price_to_EBIT_ratio(symbol: str) -> float | None:
         if ebit is None or ebit == 0:
             return None
             
-        return price / ebit
+        return str(price / ebit)
         
     except (KeyError, TypeError, ZeroDivisionError):
         return None
     
 
-def price_to_book_value_ratio(symbol: str) -> float | None:
+def price_to_book_value_ratio(symbol: str):
     """
     Calculate Price/Book Value ratio (Market Cap divided by Book Value).
     
@@ -70,7 +70,7 @@ def price_to_book_value_ratio(symbol: str) -> float | None:
         # First try to get P/B directly from yfinance
         pb_ratio = ticker.info.get('priceToBook')
         if pb_ratio is not None:
-            return pb_ratio
+            return str(pb_ratio)
             
         # If priceToBook is not available, calculate it manually
         market_cap = ticker.info.get('marketCap')
@@ -79,13 +79,13 @@ def price_to_book_value_ratio(symbol: str) -> float | None:
         if market_cap is None or book_value is None or book_value == 0:
             return None
             
-        return market_cap / book_value
+        return str(market_cap / book_value)
         
     except (KeyError, TypeError, ZeroDivisionError):
         return None
     
     
-def price_to_earnings_ratio(symbol: str) -> float | None:
+def price_to_earnings_ratio(symbol: str):
     """
     Calculate Price/Earnings ratio (Market Cap divided by Net Income).
     
@@ -109,13 +109,13 @@ def price_to_earnings_ratio(symbol: str) -> float | None:
         if market_cap is None or net_income is None or net_income == 0:
             return None
             
-        return market_cap / net_income
+        return str(market_cap / net_income)
         
     except (KeyError, TypeError, ZeroDivisionError):
         return None
         
     
-def price_earnings_to_growth_ratio(symbol: str) -> float | None:
+def price_earnings_to_growth_ratio(symbol: str):
     """
     Calculate PEG ratio (Price/Earnings ratio divided by Annual EPS Growth rate).
     PEG = (P/E) / (EPS Growth Rate)
@@ -144,7 +144,7 @@ def price_earnings_to_growth_ratio(symbol: str) -> float | None:
         if abs(growth_rate) > 1:
             growth_rate = growth_rate / 100
             
-        return pe_ratio / growth_rate
+        return str(pe_ratio / growth_rate)
         
     except (KeyError, TypeError, ZeroDivisionError):
         return None

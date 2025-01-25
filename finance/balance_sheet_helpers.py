@@ -24,7 +24,7 @@ def get_assets(ticker_symbol: str, year: str) -> float:
             year_column = balance_sheet.columns[available_years.index(year)]
             if "Current Assets" in balance_sheet.index:
                 current_assets = balance_sheet.loc["Current Assets", year_column]
-                return current_assets
+                return str(current_assets)
         return None
     
     except Exception as e:
@@ -50,7 +50,7 @@ def get_liabilities(ticker_symbol: str, year: str) -> float:
             # Check if "Total Liabilities Net Minority Interest" exists in the balance sheet
             if "Current Liabilities" in balance_sheet.index:
                 current_liabilities = balance_sheet.loc["Current Liabilities", year_column]
-                return current_liabilities 
+                return str(current_liabilities) 
         return None
     except Exception as e:
         return None
@@ -77,7 +77,7 @@ def get_inventory(ticker_symbol: str, year: str) -> float:
             # Check if "Inventory" exists in the balance sheet
             if "Inventory" in balance_sheet.index:
                 inventory_value = balance_sheet.loc["Inventory", year_column]
-                return inventory_value
+                return str(inventory_value)
           
         return None
     except Exception as e:

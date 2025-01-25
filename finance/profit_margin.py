@@ -3,7 +3,7 @@
 """
 import yfinance as yf
 
-def gross_profit_margin(symbol: str) -> float | None:
+def gross_profit_margin(symbol: str):
    """
    Calculate Gross Profit Margin (Gross Profit / Revenue)
    Shows profitability after considering cost of goods sold (COGS).
@@ -19,7 +19,7 @@ def gross_profit_margin(symbol: str) -> float | None:
        # Try to get gross margin directly
        gross_margin = ticker.info.get('grossMargins')
        if gross_margin is not None:
-           return gross_margin
+           return str(gross_margin)
            
        # If not available, calculate manually
        gross_profit = ticker.info.get('grossProfits')
@@ -28,13 +28,13 @@ def gross_profit_margin(symbol: str) -> float | None:
        if gross_profit is None or total_revenue is None or total_revenue == 0:
            return None
            
-       return gross_profit / total_revenue
+       return str(gross_profit / total_revenue)
        
    except (KeyError, TypeError, ZeroDivisionError):
        return None
    
 
-def operational_profit_margin(symbol: str) -> float | None:
+def operational_profit_margin(symbol: str):
     """
     Calculate Operating Profit Margin (Operating Income / Revenue).
     Shows how much profit a company makes from its core business operations.
@@ -50,7 +50,7 @@ def operational_profit_margin(symbol: str) -> float | None:
         # Try to get operating margin directly
         op_margin = ticker.info.get('operatingMargins')
         if op_margin is not None:
-            return op_margin
+            return str(op_margin)
             
         # If not available, calculate manually
         operating_income = ticker.info.get('operatingIncome')
@@ -59,13 +59,13 @@ def operational_profit_margin(symbol: str) -> float | None:
         if operating_income is None or total_revenue is None or total_revenue == 0:
             return None
             
-        return operating_income / total_revenue
+        return str(operating_income / total_revenue)
         
     except (KeyError, TypeError, ZeroDivisionError):
         return None
 
 
-def net_profit_margin(symbol: str) -> float | None:
+def net_profit_margin(symbol: str):
     """
     Calculate Net Profit Margin (Net Income / Revenue)
     Shows final profitability after all expenses, interest, and taxes.
@@ -90,7 +90,7 @@ def net_profit_margin(symbol: str) -> float | None:
         if net_income is None or total_revenue is None or total_revenue == 0:
             return None
             
-        return net_income / total_revenue
+        return str(net_income / total_revenue)
         
     except (KeyError, TypeError, ZeroDivisionError):
         return None
