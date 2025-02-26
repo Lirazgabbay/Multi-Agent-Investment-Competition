@@ -4,23 +4,38 @@
 import os
 from dotenv import load_dotenv
 import requests
-from finance.balance_sheet_helpers import get_assets, get_inventory, get_liabilities
 
-def quick_ratio(ticker: str, year: str):
+
+def quick_ratio(symbol: str, year: int) -> str:
     """
-    Quick Ratio = (Current Assets - Inventories) / Current Liabilities
+    Fetches the Quick Ratio (TTM) for the given company ticker using FMP API.
+
+    Args:
+        ticker (str): The stock ticker symbol.
+
+    Returns:
+        str: The Quick Ratio as a string, or an error message if unavailable.
     """
-    current_assets = float(get_assets(ticker, year))
-    inventory = float(get_inventory(ticker, year))
-    current_liabilities = float(get_liabilities(ticker, year))
+    load_dotenv()
+    api_key = os.getenv('FMP_API_KEY')
+    url = f"https://financialmodelingprep.com/api/v3/ratios/{symbol}?period=annual&apikey={api_key}"
+    response = requests.get(url)
 
-    if current_assets is None or inventory is None or current_liabilities is None:
-        return None
-        
-    return str((current_assets - inventory) / current_liabilities) if current_liabilities != 0 else "0"
+    if response.status_code == 200:
+        data = response.json()
+        if data:
+            for dict in data:
+                if dict.get('calendarYear') == str(year):
+                    quick_ratio_value = dict.get('quickRatio')
+                    return str(quick_ratio_value)
+        else:
+            return "No data returned for the specified ticker."
+    else:
+        return f"Failed to fetch data. Status Code: {response.status_code}"
+    return None
 
 
-def get_related_companies(ticker: str, n = 1) -> list:
+def get_related_companies(symbol: str, n = 1) -> list:
     """
     Fetch up to n related tickers for the given ticker from Polygon.io.
 
@@ -32,7 +47,7 @@ def get_related_companies(ticker: str, n = 1) -> list:
     """
     load_dotenv()
     api_key_polygon = os.getenv('POLYGON_API_KEY')
-    url = f"https://api.polygon.io/v1/related-companies/{ticker}"
+    url = f"https://api.polygon.io/v1/related-companies/{symbol}"
     params = {
         "apiKey": api_key_polygon
     }
@@ -45,8 +60,6 @@ def get_related_companies(ticker: str, n = 1) -> list:
         )
 
     data = response.json()
-    print(data)
-
     top_n_competitors = []
     related_tickers = data.get("results", [])
     for ticker in related_tickers:
@@ -55,4 +68,3 @@ def get_related_companies(ticker: str, n = 1) -> list:
             break
 
     return top_n_competitors
-
