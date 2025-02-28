@@ -1,98 +1,6 @@
-# import autogen
-# from config.config_list_LLM import CONFIG_LLM_GPT4
-# import init_agents as InitAgents
-# import os
-# import time
-# from autogen_agentchat.teams import SelectorGroupChat
-# from autogen_ext.models.openai import OpenAIChatCompletionClient
-# from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
-
-
-# async def init_investment_house_discussion(agents_init:InitAgents, stock_symbol: str, budget: float, name:str):
-#     """
-#     Initiates a discussion between all agents in the investment house 
-#     until a consensus is reached.
-
-#     Parameters:
-#         agents (InitAgents): Object containing all initialized agents.
-#         stock_symbol (str): The stock symbol to analyze.
-#         budget (float): Budget for the investment.
-#         name (str): Name of the investment house.
-
-#     Returns:
-#         dict: A summary of the final decision and key discussion points.
-#     """
-#     # Create a model client that will be used for the selector
-#     model_client = OpenAIChatCompletionClient(
-#         model="gpt-4",
-#         config_list=CONFIG_LLM_GPT4,
-#         timeout=200
-#     )
-    
-#     # Create the SelectorGroupChat with all the agents
-#     # Each agent will directly use their tools instead of routing through a user proxy
-#     team = SelectorGroupChat(
-#         participants=[
-#             agents_init.liquidity_agent,
-#             agents_init.historical_margin_multiplier_analyst,
-#             agents_init.competative_margin_multiplier_analyst,
-#             agents_init.qualitative_analyst,
-#             agents_init.manager_agent  # Represents the Manager agent that speaks during the discussion and provides the final decision
-#         ],
-#         model_client=model_client,
-#         termination_condition=termination,
-#         allow_repeated_speaker=True,
-#         selector_prompt=selector_prompt)
-
-# termination = MaxMessageTermination(
-#         max_messages=10) | TextMentionTermination("TERMINATE")
-    
-# selector_prompt="""You are coordinating a financial analysis discussion.
-# The following roles are available:
-# {roles}.
-
-# Read the following conversation. Then select the next role from {participants} to speak.
-# Choose the role that should logically continue the discussion based on their expertise and the current discussion flow.
-# each agent should:
-# - execute the function call they suggest
-# - Analyze the results and provide insights
-# - Challenge any perspectives they disagree with
-# only after some agent finishes their analysis, choose the next agent to speak
-# Only return the role name.
-
-# {history}
-
-# Based on the conversation above, select the next role from {participants} to speak. Only return the role name.
-# """
-
-# # Constructing the initial message
-# initial_message = f"""Let's analyze {stock_symbol} for a potential investment of ${budget:,.2f}.
-# Liquidity Analyst, please start by presenting your analysis of {stock_symbol} liquidity.
-# Historical Margin Analyst, follow with an analysis of historical margin trends.
-# Competitive Margin Analyst, provide your insights on competitive positioning.
-# Qualitative Analyst, provide your insights on qualitative factors.
-# Manager, please guide the discussion and ensure all perspectives are considered. Facilitate a consensus on whether to invest and how much.
-# All agents please respond to each other for challenging any perspectives you disagree with."""
-
-#     # Run the discussion
-#     result = await groupchat.run(task=initial_message)
-    
-#     # Extract all messages from the result
-#     messages = result.messages
-    
-#     # Create a chat history string from all messages
-#     chat_history = "\n".join([f"{msg.source}: {msg.content}" for msg in messages])
-    
-#     # Use the summary agent to create a summary
-#     summary = agents_init.summary_agent.generate_reply(
-#         messages=[{"role": "user", "content": f"Summarize this discussion:\n{chat_history}"}],
-#         sender=agents_init.user_proxy
-#     )
-
-#     return summary["content"] if isinstance(summary, dict) else summary
-
-
 import asyncio
+import datetime
+import json
 import os
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
@@ -101,17 +9,19 @@ from autogen_agentchat.ui import Console
 from autogen_agentchat.messages import TextMessage
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
-from config.config_list_LLM import CONFIG_LLM_GPT4
+import requests
+from config.config_list_LLM import CONFIG_LLM_GPT
+import datetime
 
 
-async def init_investment_house_discussion(agents_init, stock_symbol: str, budget: float, name: str):
+async def init_investment_house_discussion(agents_init, stocks_symbol: list[str], budget: float, name: str, start_year: int):
     """
     Initiates a discussion between all agents in the investment house 
     until a consensus is reached.
 
     Parameters:
         agents_init: Object containing all initialized agents.
-        stock_symbol (str): The stock symbol to analyze.
+        stocks_symbol [str]: The stocks symbols to analyze.
         budget (float): Budget for the investment.
         name (str): Name of the investment house.
 
@@ -159,7 +69,6 @@ Read the following conversation. Then select the next role from {participants} t
 
 Read the above conversation. Then select the next role from {participants} to play. ONLY RETURN THE ROLE."""
     
-    # Create the SelectorGroupChat with all the agents
     team = SelectorGroupChat(
         participants=[
             agents_init.liquidity_agent,
@@ -174,34 +83,36 @@ Read the above conversation. Then select the next role from {participants} to pl
         allow_repeated_speaker=True
     )
     
-    # Constructing the initial message
-    initial_message = f"""Let's analyze {stock_symbol} for a potential investment of ${budget:,.2f}.
-Liquidity Analyst, please start by presenting your analysis of {stock_symbol} liquidity.
+    dict_symbol_price = StockPrice(stocks_symbol, start_year)
+
+
+    initial_message = f"""Let's analyze {stocks_symbol} for a potential investment of ${budget:,.2f}.
+Liquidity Analyst, please start by presenting your analysis of {stocks_symbol} liquidity.
 Historical Margin Analyst, follow with an analysis of historical margin trends.
 Competitive Margin Analyst, provide your insights on competitive positioning.
 Qualitative Analyst, provide your insights on qualitative factors.
 Manager, please guide the discussion and ensure all perspectives are considered. Facilitate a consensus on whether to invest and how much.
-All agents please respond to each other for challenging any perspectives you disagree with."""
+All agents please respond to each other for challenging any perspectives you disagree with.
+
+The current prices of {stocks_symbol} are {dict_symbol_price}.
+Please base your analyses on data up to and including {start_year}."""
 
 
- # Use Console to display conversation in real-time
+    # Use Console to display conversation in real-time
     print("\nStarting conversation:")
     
     result = await Console(team.run_stream(task=initial_message))
     messages = result.messages
 
-    # Use the summary agent to create a summary
     try:
-        # Create a message for the summary agent
         summary_message = TextMessage(
             content=f"Summarize this discussion:\n{messages}", 
             source="user"
         )
         
-        # Use on_messages instead of generate_reply
         summary_response = await agents_init.summary_agent.on_messages(
             [summary_message], 
-            None  # No cancellation token needed
+            None  
         )
         
         # Extract the content from the response
@@ -212,20 +123,41 @@ All agents please respond to each other for challenging any perspectives you dis
             
     except Exception as e:
         print(f"Error generating summary: {e}")
-        return f"The discussion about {stock_symbol} included multiple messages from the team. A formal summary could not be generated due to a technical issue."
-        # Run the discussion
-    # result = await team.run(task=initial_message)
-    
-    # Extract all messages from the result
-    # messages = result.messages
-    
-    # Create a chat history string from all messages
-    # chat_history = "\n".join([f"{msg.source}: {msg.content}" for msg in messages])
-    
-    # # Use the summary agent to create a summary
-    # summary = agents_init.summary_agent.generate_reply(
-    #     messages=[{"role": "user", "content": f"Summarize this discussion:\n{chat_history}"}],
-    #     sender=agents_init.user_proxy
-    # )
+        return f"The discussion about {stocks_symbol} included multiple messages from the team. A formal summary could not be generated due to a technical issue."
 
-    # return summary["content"] if isinstance(summary, dict) else summary
+
+
+def StockPrice(symbols: list[str], start_year: int):
+    """
+    Get the closing stock prices for specific symbols within a given year.
+
+    Parameters:
+    symbols (list[str]): List of stock ticker symbols.
+    start_year (int): The year for which to retrieve closing prices.
+
+    Returns:
+    dict: A dictionary with symbols as keys and lists of closing prices as values.
+    """
+    load_dotenv()
+    api_key = os.getenv('FMP_API_KEY')
+    if not api_key:
+        raise ValueError("API key not found. Please set the 'FMP_API_KEY' environment variable.")
+    
+    base_url = "https://financialmodelingprep.com/api/v3/historical-price-full"
+    headers = {'Content-Type': 'application/json'}
+    res = {}
+
+    for stock_symbol in symbols:
+        url = f"{base_url}/{stock_symbol}?apikey={api_key}"
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if 'historical' in data:
+                for record in data['historical']:
+                    record_date = datetime.datetime.strptime(record['date'], '%Y-%m-%d')
+                    if record_date.year == start_year:
+                        res[stock_symbol] = record['close']
+                        break
+    
+    return res
