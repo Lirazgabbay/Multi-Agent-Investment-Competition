@@ -5,6 +5,7 @@
 import os
 from dotenv import load_dotenv
 import requests
+import json
 
 def fetch_income_statement(symbol: str, year: int) -> dict: 
     load_dotenv()
@@ -52,11 +53,13 @@ def calculate_profit_margins(symbol: str, year: int) -> dict:
             operating_margin = (operating_income / revenue) * 100 if operating_income else None
             net_margin = (net_income / revenue) * 100 if net_income else None
 
-            return {
+            result = {
                 'Gross Profit Margin (%)': gross_margin,
                 'Operating Profit Margin (%)': operating_margin,
                 'Net Profit Margin (%)': net_margin
             }
+            return json.dumps(result)
         else:
             return {"error": "Revenue is zero or undefined."}
     return {"error": "No data available for the given symbol and year."}
+

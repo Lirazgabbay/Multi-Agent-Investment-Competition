@@ -1,3 +1,4 @@
+import json
 import os
 from dotenv import load_dotenv
 import requests
@@ -83,12 +84,13 @@ def ratios(symbol: str, year:int) -> dict:
                     price_to_book = entry.get("priceToBookRatio")
                     price_earnings_to_growth = entry.get("priceEarningsToGrowthRatio")
                     price_to_sales_ratio = entry.get("priceToSalesRatio")
-                    return {
+                    result = {
                         "price_to_earning": price_to_earning,
                         "price_to_book": price_to_book,
                         "price_earnings_to_growth": price_earnings_to_growth,
                         "price_to_sales_ratio": price_to_sales_ratio
                     }
+                    return json.dumps(result)
             print(f"No data returned for {symbol}.")
             return None
     else:

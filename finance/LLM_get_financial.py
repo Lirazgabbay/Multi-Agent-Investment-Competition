@@ -4,6 +4,7 @@
 import os
 from dotenv import load_dotenv
 import requests
+from logging_decorator import log_api_call
 
 
 def quick_ratio(symbol: str, year: int) -> str:
@@ -35,7 +36,7 @@ def quick_ratio(symbol: str, year: int) -> str:
     return None
 
 
-def get_related_companies(symbol: str, n = 1) -> list:
+def get_related_companies(symbol: str, n: int = 1) -> list:
     """
     Fetch up to n related tickers for the given ticker from Polygon.io.
 

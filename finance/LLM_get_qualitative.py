@@ -5,7 +5,7 @@
 import requests
 import os
 from dotenv import load_dotenv
-
+import json
 
 def extract_business_info(symbol: str) -> dict:
     """
@@ -25,9 +25,10 @@ def extract_business_info(symbol: str) -> dict:
     
     if response.status_code == 200:
         data = response.json()
-        return {
+        result= {
             "businessDescription": data.get("results", {}).get("description", "No description available")
         }
+        return json.dumps(result) 
     
     return {"error": f"Failed to fetch company data. Status Code: {response.status_code}"}
 
@@ -62,6 +63,6 @@ def get_company_data(symbol: str, limit: int = 2) -> dict:
                 "URL": article.get("article_url", "No URL available")
             }
         
-        return articles_info
+        return json.dumps(articles_info) 
     
     return {"error": f"Failed to fetch news. Status Code: {response.status_code}"}
