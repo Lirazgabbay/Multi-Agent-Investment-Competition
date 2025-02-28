@@ -4,7 +4,6 @@
 import os
 from dotenv import load_dotenv
 import requests
-from logging_decorator import log_api_call
 
 
 def quick_ratio(symbol: str, year: int) -> str:
