@@ -7,6 +7,8 @@ import os
 from dotenv import load_dotenv
 import json
 
+from database.api_utils import cached_api_request
+
 def extract_business_info(symbol: str) -> dict:
     """
     Extracts strategic elements from company information using Polygon.io.
@@ -17,20 +19,23 @@ def extract_business_info(symbol: str) -> dict:
     Returns:
         dict: A dictionary containing a business summary of the company.
     """
-    load_dotenv()
-    api_key_polygon = os.getenv('POLYGON_API_KEY')
-    url = f"https://api.polygon.io/v3/reference/tickers/{symbol}?apiKey={api_key_polygon}"
+    response_text = cached_api_request(
+        url=f"https://api.polygon.io/v3/reference/tickers/{symbol}",
+        api_key_name="POLYGON_API_KEY",
+        api_key_in_url=True,
+        api_key_param="apiKey"
+    )
     
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        data = response.json()
-        result= {
+    try:
+        data = json.loads(response_text)
+        result = {
             "businessDescription": data.get("results", {}).get("description", "No description available")
         }
         return json.dumps(result) 
-    
-    return {"error": f"Failed to fetch company data. Status Code: {response.status_code}"}
+    except json.JSONDecodeError:
+        return json.dumps({"error": "Failed to parse API response as JSON"})
+    except Exception as e:
+        return json.dumps({"error": f"Error processing API response: {str(e)}"})
 
 
 def get_company_data(symbol: str, limit: int = 2) -> dict:
@@ -44,14 +49,17 @@ def get_company_data(symbol: str, limit: int = 2) -> dict:
     Returns:
         dict: A dictionary containing news articles related to the company.
     """
-    load_dotenv()
-    API_KEY_POLYGON = os.getenv('POLYGON_API_KEY')
-    url = f"https://api.polygon.io/v2/reference/news?ticker={symbol}&limit={limit}&apiKey={API_KEY_POLYGON}"
+    response_text = cached_api_request(
+        url=f"https://api.polygon.io/v2/reference/news",
+        api_key_name="POLYGON_API_KEY",
+        api_key_in_url=True,
+        api_key_param="apiKey",
+        params={"ticker": symbol, "limit": limit}
+    )
     
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        news = response.json().get("results", [])
+    try:
+        data = json.loads(response_text)
+        news = data.get("results", [])
         articles_info = {}
 
         for index, article in enumerate(news):
@@ -63,6 +71,8 @@ def get_company_data(symbol: str, limit: int = 2) -> dict:
                 "URL": article.get("article_url", "No URL available")
             }
         
-        return json.dumps(articles_info) 
-    
-    return {"error": f"Failed to fetch news. Status Code: {response.status_code}"}
+        return json.dumps(articles_info)
+    except json.JSONDecodeError:
+        return json.dumps({"error": "Failed to parse API response as JSON"})
+    except Exception as e:
+        return json.dumps({"error": f"Error processing API response: {str(e)}"})

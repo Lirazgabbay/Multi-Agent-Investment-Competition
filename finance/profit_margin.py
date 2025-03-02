@@ -1,11 +1,12 @@
 """
     profit_margin.py - Functions to calculate profit margins for a company ticker symbol.
 """
-
 import os
 from dotenv import load_dotenv
 import requests
 import json
+
+from database.api_utils import cached_api_request
 
 def fetch_income_statement(symbol: str, year: int) -> dict: 
     """
@@ -17,17 +18,24 @@ def fetch_income_statement(symbol: str, year: int) -> dict:
     returns:
         - a dictionary containing the income statement data for the given year.
     """
-    load_dotenv()
-    api_key = os.getenv('FMP_API_KEY')
-    url = f"https://financialmodelingprep.com/api/v3/income-statement/{symbol}?apikey={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
+    response_text = cached_api_request(
+        url=f"https://financialmodelingprep.com/api/v3/income-statement/{symbol}",
+        api_key_name="FMP_API_KEY",
+        api_key_param="apikey",
+        api_key_in_url=True
+    )
+    try:
+        data = json.loads(response_text)
         for dict in data:
             if dict['calendarYear'] == str(year):
                 return dict
-    return None
-
+        return None
+    except json.JSONDecodeError:
+        print("Failed to parse API response as JSON")
+        return None
+    except Exception as e:
+        print(f"Error processing API response: {str(e)}")
+        return None
 
 def calculate_profit_margins(symbol: str, year: int) -> dict:
     """
@@ -60,4 +68,3 @@ def calculate_profit_margins(symbol: str, year: int) -> dict:
         else:
             return {"error": "Revenue is zero or undefined."}
     return {"error": "No data available for the given symbol and year."}
-

@@ -26,14 +26,19 @@ def historical_func(symbols: list, years: list):
 
 def competative_func(symbol: str, years: list[int]):
     """
-    receives a symbol and a list of years and returns a dictionary with the competative data for the symbol
+    Receives a symbol and a list of years and returns a dictionary with the competitive data for the symbol.
 
-    returns:
-        results: dictionary with the competative data for the symbol
+    Returns:
+        results: dictionary with the competitive data for the symbol.
     """
     results = {}
-    related_company = get_related_companies(symbol)[0]
+    related_companies = get_related_companies(symbol)
+    
+    if not related_companies:
+        results[symbol] = {"error": "No related companies found"}
+        return results  # Return early if no competitors are found
 
+    related_company = related_companies[0]
     results[related_company] = {}
     results[symbol] = {}
 
