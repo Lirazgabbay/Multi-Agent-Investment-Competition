@@ -74,3 +74,25 @@ class InitAgents():
         self.user_proxy = UserProxyAgent(
             name="User_Proxy"
         )
+
+
+
+async def test_agent_with_tool():
+    agents_init = InitAgents()
+    liquidity_agent = agents_init.liquidity_agent
+
+    try:
+        # Test the agent with a direct message
+        response = await liquidity_agent.on_messages(
+            [TextMessage(content="analyze AAPL symbole", source="user")], 
+            CancellationToken()
+        )
+        print("Liquidity agent response:", response)
+    except Exception as e:
+        print(f"Error testing liquidity agent: {e}")
+        import traceback
+        traceback.print_exc()
+
+if __name__ == "__main__":
+    # Run both tests
+    asyncio.run(test_agent_with_tool())

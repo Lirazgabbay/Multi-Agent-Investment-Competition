@@ -38,7 +38,7 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         temperature=0.7,
         timeout=200
     )
-        
+    
     # Set up termination conditions
     text_termination = TextMentionTermination("TERMINATE")
     max_messages = MaxMessageTermination(max_messages=15)
