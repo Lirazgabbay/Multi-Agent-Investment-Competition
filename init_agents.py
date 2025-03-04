@@ -1,3 +1,8 @@
+"""
+init_agents.py
+This module contains the InitAgents class that initializes all the agents required for the group chat.
+"""
+
 import os
 from dotenv import load_dotenv
 from config.system_messages import SYS_MSG_MANAGER_CONFIG, SYS_MSG_PRO_INVEST, SYS_MSG_SOLID_AGENT, SYSTEM_MSG_COMPETATIVE_MARGIN_MULTIPLIER_CONFIG, SYSTEM_MSG_HISTORICAL_MARGIN_MULTIPLIER_CONFIG, SYSTEM_MSG_LIQUIDITY_CONFIG, SYSTEM_MSG_QUALITATIVE_CONFIG, SYS_MSG_PRO_INVEST,SYS_MSG_RED_FLAGS
@@ -5,7 +10,6 @@ from finance.LLM_get_financial import quick_ratio
 from finance.agents_functions import competative_func, historical_func, qualitative_func
 from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
 from autogen_ext.models.openai import OpenAIChatCompletionClient
-# from autogen_ext.agents.web_surfer import MultimodalWebSurfer
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from search import google_search
 from autogen_core.tools import FunctionTool
@@ -117,26 +121,3 @@ class InitAgents():
             system_message="You are a helpful AI assistant. You are getting tasks only from the red_flags_agent and solve tasks using your tools.",
             reflect_on_tool_use=True 
         )
-
-
-
-
-# async def test_agent_with_tool():
-#     agents_init = InitAgents()
-#     liquidity_agent = agents_init.liquidity_agent
-
-#     try:
-#         # Test the agent with a direct message
-#         response = await liquidity_agent.on_messages(
-#             [TextMessage(content="analyze AAPL symbole", source="user")], 
-#             CancellationToken()
-#         )
-#         print("Liquidity agent response:", response)
-#     except Exception as e:
-#         print(f"Error testing liquidity agent: {e}")
-#         import traceback
-#         traceback.print_exc()
-
-# if __name__ == "__main__":
-#     # Run both tests
-#     asyncio.run(test_agent_with_tool())
