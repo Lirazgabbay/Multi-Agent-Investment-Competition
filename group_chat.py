@@ -1,6 +1,8 @@
-import asyncio
+"""
+group_chat.py
+This file contains the code for the group chat functionality of the Investment House discussion.
+"""
 import datetime
-import json
 import os
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
@@ -10,7 +12,6 @@ from autogen_agentchat.messages import TextMessage
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
 import requests
-from config.config_list_LLM import CONFIG_LLM_GPT
 import datetime
 
 
@@ -28,8 +29,6 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     Returns:
         dict: A summary of the final decision and key discussion points.
     """
-    # Create a model client that will be used for the selector
-
     load_dotenv()
     api_key_open_AI = os.getenv('OPEN_AI_API_KEY')
     model_client = OpenAIChatCompletionClient(
@@ -39,27 +38,11 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         timeout=600
     )
     
-    # Set up termination conditions
     text_termination = TextMentionTermination("TERMINATE")
     max_messages = MaxMessageTermination(max_messages=30)
     termination = text_termination | max_messages
     
-#     # Create the selector prompt
-#     selector_prompt = """You are a coordinator of a financial analysis discussion.
-
-# The groupchat order starts as follows:
-# liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> search_agent -> debate_agent -> manager_agent.
-# in case of a deadlock, the manager_agent should intervene.
-
-# after that, and given the current context and debate - select the most appropriate next speaker.
-# The following roles are available:
-# {roles}.
-
-# {history}
-# Read the above conversation. Then select the next role from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE."""
-
     selector_prompt = """You are a coordinator of a financial analysis discussion.
-
     The first speaker must always be the **liquidity_agent**. 
     The groupchat order should follow:
     liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> search_agent -> red_flags_agent_liquidity -> search_agent -> liquidity_agent -> solid_agent -> search_agent -> Pro_Investment_agent -> search_agent -> manager_agent.
@@ -71,8 +54,7 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> red_flags_agent_liquidity -> Pro_Investment_agent -> solid_agent
 
     Now, given the current context and debate - select the most appropriate next speaker.
-    The following roles are available:
-    {roles}.
+    The following roles are available: {roles}.
 
     {history}
     Read the above conversation. Then select the next role from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE."""
@@ -101,58 +83,33 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     dict_symbol_price = StockPrice(stocks_symbol, start_year)
 
 
-#     initial_message = f"""Let's analyze {stocks_symbol} for a potential investment of ${budget:,.2f}.
-# Liquidity Analyst, please start by presenting your analysis of {stocks_symbol} liquidity.
-# Historical Margin Analyst, speak after, follow with an analysis of historical margin trends.
-# Competitive Margin Analyst, provide your insights on competitive positioning.
-# Qualitative Analyst, provide your insights on qualitative factors.
-# red flags agent, please identify potential risks and problems with the analysis of the team and ask the search_agent to search for information that supports your doubts.
-# search agent, you are getting tasks only from the red_flags_agent - please provide any information he asks for in order to help the team think about potential risks and problems with their analysis.
-# Debate Agent, challenge perspectives you disagree with and try to convince others if they are wrong.
-# Manager, please guide the discussion and ensure all perspectives are considered. Facilitate a consensus on whether to invest and how much.
-
-# Each agent should:
-# - respond to each other for challenging any perspectives you disagree with.
-# - Execute only the function call it has, and analyze the data accordingly.
-# - Return a final decision and the amount of investment you suggest at the end of the discussion.
-
-# The manager_agent should intervene only as a last resort and when strictly necessary:
-# - If no other agent has a relevant function to execute
-# - If the conversation reaches a deadlock and no forward progress is made for two rounds
-# - If an explicit request for summarization or resolution is made by another agent
-
-# The current prices of {stocks_symbol} are {dict_symbol_price}.
-# Please base your analyses on data up to and including {start_year}."""
-
     initial_message = f"""Let's analyze {stocks_symbol} for a potential investment of ${budget:,.2f}.
+    Liquidity Analyst, start by presenting your analysis of liquidity.  
+    Historical Margin Analyst, speak after the Liquidity Analyst and provide an analysis of historical margin trends.  
+    Competitive Margin Analyst, speak after the Historical Analyst and add insights on competitive positioning.  
+    Qualitative Analyst, present your insights on qualitative factors after the Competitive Margin Analyst.  
 
-Liquidity Analyst, start by presenting your analysis of liquidity.  
-Historical Margin Analyst, speak after the Liquidity Analyst and provide an analysis of historical margin trends.  
-Competitive Margin Analyst, speak after the Historical Analyst and add insights on competitive positioning.  
-Qualitative Analyst, present your insights on qualitative factors after the Competitive Margin Analyst.  
+    Red Flags Agent, you should identify potential risks and weaknesses only after the team has completed their analyses.  
+    red_flags_agent_liquidity, you should identify potential risks and problems with the analysis
+    solid_agent, you should exposing all potential dangers, uncertainties, and red flags associated with any investment decision.
+    Pro_Investment_agent, you should emphasizes that inaction is the biggest financial risk
+    Search Agent, you only respond to requests from the Red Flags Agent, red_flags_agent_liquidity,solid_agent,Pro_Investment_agent — provide any information they ask for to help assess risks and concerns.  
 
-Red Flags Agent, you should identify potential risks and weaknesses only after the team has completed their analyses.  
-red_flags_agent_liquidity, you should identify potential risks and problems with the analysis
-solid_agent, you should exposing all potential dangers, uncertainties, and red flags associated with any investment decision.
-Pro_Investment_agent, you should emphasizes that inaction is the biggest financial risk
-Search Agent, you only respond to requests from the Red Flags Agent, red_flags_agent_liquidity,solid_agent,Pro_Investment_agent — provide any information they ask for to help assess risks and concerns.  
+    Manager, ensure all perspectives are considered and facilitate a consensus on whether to invest and how much.  
 
-Manager, ensure all perspectives are considered and facilitate a consensus on whether to invest and how much.  
+    Each agent should:  
+    - Respond to each other when challenging perspectives.  
+    - Execute only their designated function calls and analyze the data accordingly.  
+    - Return a final decision and the recommended investment amount at the end of the discussion.  
 
-Each agent should:  
-- Respond to each other when challenging perspectives.  
-- Execute only their designated function calls and analyze the data accordingly.  
-- Return a final decision and the recommended investment amount at the end of the discussion.  
+    The Manager Agent should intervene only as a last resort in the following cases:  
+    - No other agent has a relevant function to execute.  
+    - The conversation reaches a deadlock and no progress is made for two rounds.  
+    - Request from every agent to provide a final decision of investment (percentage from the budget). 
 
-The Manager Agent should intervene only as a last resort in the following cases:  
-- No other agent has a relevant function to execute.  
-- The conversation reaches a deadlock and no progress is made for two rounds.  
-- Request from every agent to provide a final decision of investment (percentage from the budget). 
+    The current prices of {stocks_symbol} are {dict_symbol_price}.  
+    Please base your analyses on data up to and including {start_year}."""
 
-The current prices of {stocks_symbol} are {dict_symbol_price}.  
-Please base your analyses on data up to and including {start_year}."""
-
-    # Use Console to display conversation in real-time
     print("\nStarting conversation:")
     
     result = await Console(team.run_stream(task=initial_message))
@@ -179,9 +136,6 @@ Please base your analyses on data up to and including {start_year}."""
     except Exception as e:
         print(f"Error generating summary: {e}")
         return f"The discussion about {stocks_symbol} included multiple messages from the team. A formal summary could not be generated due to a technical issue."
-    # finally:
-    #     # Close the browser controlled by the agent
-    #     await agents_init.web_surfer_agent.close()
 
 
 def StockPrice(symbols: list[str], start_year: int):
