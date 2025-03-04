@@ -1,9 +1,8 @@
 """
-api_utils.py - 
+api_utils.py
 Utility functions for making API requests with caching
 using FastAPI routes for chacning API responses.
 """
-import json
 import requests
 from typing import Dict, Optional, Any
 import os
@@ -89,101 +88,3 @@ def cached_api_request(
         # Continue even if caching fails
     
     return response_text
-
-# Example usage patterns:
-symbol = "AAPL"
-# For Polygon.io with API key in params:
-# response = cached_api_request(
-#     url=f"https://api.polygon.io/v1/related-companies/{symbol}",
-#     api_key_name="POLYGON_API_KEY",
-#     api_key_in_url=False
-# )
-# print(response)
-
-# # For FMP with API key in URL:
-# response = cached_api_request(
-#     url=f"https://financialmodelingprep.com/api/v3/ratios/{symbol}",
-#     api_key_name="FMP_API_KEY",
-#     api_key_param="apikey",
-#     api_key_in_url=True,
-#     params={"period": "annual"}
-# )
-# print(response)
-# Or if URL already includes some parameters:
-# response = cached_api_request(
-#     url=f"https://financialmodelingprep.com/api/v3/ratios/{symbol}?period=annual",
-#     api_key_name="FMP_API_KEY",
-#     api_key_param="apikey",
-#     api_key_in_url=True
-# )
-# print(response)
-
-# response_text = cached_api_request(
-#     url=f"https://financialmodelingprep.com/api/v3/ratios/{symbol}",
-#     api_key_name="FMP_API_KEY",
-#     api_key_param="apikey",
-#     api_key_in_url=True,
-#     params={"period": "annual"}
-# )
-# print(response_text)
-# response_text = cached_api_request(
-#     url=f"https://api.polygon.io/v1/related-companies/{symbol}",
-#     api_key_name="POLYGON_API_KEY",
-#     api_key_in_url=False,
-#     api_key_param="apiKey"
-# )
-# print(response_text)
-# response_text = cached_api_request(
-#         url=f"https://api.polygon.io/v3/reference/tickers/{symbol}",
-#         api_key_name="POLYGON_API_KEY",
-#         api_key_in_url=True,
-#         api_key_param="apiKey"
-#     )
-# print(response_text)
-# response_text = cached_api_request(
-#     url=f"https://api.polygon.io/v2/reference/news",
-#     api_key_name="POLYGON_API_KEY",
-#     api_key_in_url=True,
-#     api_key_param="apiKey",
-#     params={"ticker": symbol, "limit": 1}
-# )
-
-# response_text = cached_api_request(
-#         url=f"https://financialmodelingprep.com/api/v3/income-statement/{symbol}",
-#         api_key_name="FMP_API_KEY",
-#         api_key_param="apikey",
-#         api_key_in_url=True
-#     )
-
-# year = 2021
-# market_cap_response_text = cached_api_request(
-#         url=f"https://financialmodelingprep.com/api/v3/historical-market-capitalization/{symbol}",
-#         api_key_name="FMP_API_KEY",
-#         api_key_param="apikey",
-#         api_key_in_url=True,
-#         params={
-#             "limit": 1,
-#             "from": f"{year}-01-01",
-#             "to": f"{year}-12-31"
-#         }
-#     )
-# print(market_cap_response_text)    
-# income_statement_response_text = cached_api_request(
-#         url=f"https://financialmodelingprep.com/api/v3/income-statement/{symbol}",
-#         api_key_name="FMP_API_KEY",
-#         api_key_param="apikey",
-#         api_key_in_url=True,
-#         params={
-#             "limit": 10,
-#             "period": "annual"
-#         }
-#     )
-# print(income_statement_response_text)
-# response_text = cached_api_request(
-#         url=f"https://financialmodelingprep.com/api/v3/ratios/{symbol}",
-#         api_key_name="FMP_API_KEY",
-#         api_key_param="apikey",
-#         api_key_in_url=True,
-#         params={"period": "annual"}
-#     )
-# print(response_text)
