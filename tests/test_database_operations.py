@@ -1,3 +1,23 @@
+"""
+test_database_routes.py
+This test suite validates the functionality of the FastAPI-based database routes.
+
+Covered Tests:
+1.  Ensures the test database is properly initialized.
+2.  Verifies table creation, data insertion, and edge cases.
+3. FastAPI Endpoints:
+   - `/log_api_call`: Tests logging API calls with valid and invalid data.
+   - `/get_api_call`: Checks retrieval of logged API calls.
+4. Error Handling:
+   - Missing fields in requests.
+   - Large payload handling.
+   - Cleanup of the temporary database after test execution.
+
+Mocking:
+- Uses `pytest` fixtures for database setup.
+- Employs `TestClient` to simulate API requests.
+
+"""
 import pytest
 import sqlite3
 import os
@@ -43,6 +63,7 @@ def test_db():
     
     yield table_methods
     db.close()
+
 
 def test_create_table(test_db):
     """
