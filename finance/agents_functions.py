@@ -1,3 +1,8 @@
+"""
+agents_functions.py
+This file contains wrapper functions that the agents will use to interact with the finance module. 
+These functions will be called by the agents to get financial data and perform analysis.
+"""
 from finance.LLM_get_financial import get_related_companies
 from finance.LLM_get_qualitative import extract_business_info, get_company_data
 from finance.profit_margin import calculate_profit_margins

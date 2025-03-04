@@ -1,5 +1,5 @@
 """
-    app_constants.py - constants file for init the group chat
+app_constants.py - constants file for init the group chat
 """
 
 BUDGET=100000  
@@ -7,4 +7,4 @@ BUDGET=100000
 TICKER_STOCKS = [
     "AAPL"  # Apple Inc.
 ]
-START_YEAR=2022
+START_YEAR=2
