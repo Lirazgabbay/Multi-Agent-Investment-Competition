@@ -1,4 +1,6 @@
 """
+test_finance_functions.py
+This module contains the unit tests for the finance functions.
 validate financial functions. 
 It ensures that functions analyzing financial and qualitative data work correctly by
 mocking external dependencies to provide controlled test conditions.
