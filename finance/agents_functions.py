@@ -77,3 +77,4 @@ def qualitative_func(symbols: list):
         }
 
     return results
+

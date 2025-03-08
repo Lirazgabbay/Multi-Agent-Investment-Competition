@@ -1,13 +1,9 @@
+"""
+profit_multipliers.py - Functions to calculate profit multipliers for a company ticker symbol.
+"""
 import json
-import os
-from dotenv import load_dotenv
-import requests
-
 from database.api_utils import cached_api_request
 
-"""
-    profit_multipliers.py - Functions to calculate profit multipliers for a company ticker symbol.
-"""
 
 def price_to_EBIT_ratio(symbol: str, year: int ) -> str:
     """

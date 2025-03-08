@@ -56,7 +56,7 @@ def get_company_data(symbol: str, limit: int = 2) -> dict:
         api_key_param="apiKey",
         params={"ticker": symbol, "limit": limit}
     )
-    
+
     try:
         data = json.loads(response_text)
         news = data.get("results", [])
