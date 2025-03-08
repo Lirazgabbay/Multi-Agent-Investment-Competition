@@ -40,6 +40,13 @@ Your final verdict should explicitly state:
 - The key factors that influenced your judgment
 - Any notable strengths or weaknesses in each house's approach
 
+**Important Consideration**:  
+- If the profit is less than the initial investment, classify it as a loss.
+- If both house made a loss, choose the one with the least loss.
+- If both house made a profit, choose the one with the highest profit.
+- If one house made a profit and the other made a loss, choose the one with the profit.
+- A good investment decision is not always the most profitable one—consider whether returns were due to **foreseeable** or **unforeseeable** factors.
+
 Remember that a good investment decision is not always the one with the highest returns if those returns were due to unforeseeable circumstances.
 Print the final conclusion, and then the word "TERMINATE" to end the discussion.
 """
