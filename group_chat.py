@@ -8,12 +8,18 @@ from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermi
 from autogen_agentchat.teams import SelectorGroupChat
 from autogen_agentchat.ui import Console
 from autogen_agentchat.messages import TextMessage
+from autogen_core import AgentId
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
 import streamlit as st
 import requests
 import datetime
 import os
+from autogen_agentchat.messages import (
+    ModelClientStreamingChunkEvent,
+    ToolCallRequestEvent,
+    ToolCallExecutionEvent
+)
 
 
 async def init_investment_house_discussion(agents_init, stocks_symbol: list[str], budget: float, name: str, start_year: int, chat_placeholder):
@@ -124,16 +130,32 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     # result = await Console(team.run_stream(task=initial_message)
     # messages = result.messages
     messages = []
-    async for message in team.run_stream(task=initial_message):
-        if isinstance(message, TextMessage):
-            message = message.content
-        messages.append(str(message))
-        chat_messages.append(str(message))
-        # Update UI dynamically for only this investment house
-        with chat_placeholder:
-            st.markdown("\n".join(map(str, chat_messages)), unsafe_allow_html=True)
+    async for event in team.run_stream(task=initial_message):
+        # Skip system-generated messages (function calls, tool execution logs)
+        if isinstance(event, (ModelClientStreamingChunkEvent, ToolCallRequestEvent, ToolCallExecutionEvent)):
+            continue  # Ignore tool execution events
 
-        await asyncio.sleep(0.1)  # Allow UI update
+        # Extract agent name properly
+        agent_name = getattr(event, "source", "Unknown Agent")
+        if isinstance(agent_name, AgentId):  # If the source is an AgentId object
+            agent_name = agent_name.type
+
+        # Extract message content
+        message_content = getattr(event, "content", str(event))
+
+        # Format the message
+        formatted_message = f"**{agent_name}:** {message_content}"
+
+        messages.append(formatted_message)
+        chat_messages.append(formatted_message)
+
+        # Update UI dynamically
+        chat_placeholder.markdown("\n".join(chat_messages), unsafe_allow_html=True)
+
+        await asyncio.sleep(0.1)  # Allow UI to update smoothly
+
+
+
     try:
         summary_message = TextMessage(
             content=f"Summarize this discussion:\n{messages} and conclude a final investment decision.", 
