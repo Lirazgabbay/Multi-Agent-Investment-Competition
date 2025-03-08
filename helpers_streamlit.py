@@ -117,11 +117,6 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         start_year
     )
     
-    st.session_state.house1_messages.append(house1_result)
-    with house1_chat:
-        st.empty()
-        st.markdown(house1_result, unsafe_allow_html=True)
-    
     house2_result = await init_investment_house_discussion(
         investment_house2, 
         stocks.split(","), 
@@ -129,11 +124,6 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         "Investment House 2", 
         start_year
     )
-    
-    st.session_state.chat_messages_2.append(house2_result)
-    with house2_chat:
-        st.empty()
-        st.markdown(house2_result, unsafe_allow_html=True)
     
     judge_summary = f"House 1: {house1_result}\n\nHouse 2: {house2_result}"
     

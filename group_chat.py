@@ -2,6 +2,7 @@
 group_chat.py
 This file contains the code for the group chat functionality of the Investment House discussion.
 """
+import asyncio
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_agentchat.teams import SelectorGroupChat
@@ -9,6 +10,7 @@ from autogen_agentchat.ui import Console
 from autogen_agentchat.messages import TextMessage
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
+import streamlit as st
 import requests
 import datetime
 import os
@@ -109,12 +111,33 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     The current prices of {stocks_symbol} are {dict_symbol_price}.  
     Please base your analyses on data up to and including {start_year}."""
 
+    chat_placeholder = st.empty()
+
+    # Ensure session state variables exist
+    if "house1_messages" not in st.session_state:
+        st.session_state.house1_messages = []
+    if "chat_messages_2" not in st.session_state:
+        st.session_state.chat_messages_2 = []
+    
+    if name == "Investment House 1":
+        st.session_state.investment_house = st.session_state.house1_messages
+    else:
+        st.session_state.investment_house = st.session_state.chat_messages_2
+
     print("\nStarting conversation:")
     
-    result = await Console(team.run_stream(task=initial_message))
+    # result = await Console(team.run_stream(task=initial_message)
+    # messages = result.messages
+    messages = []
+    async for message in team.run_stream(task=initial_message):
+        if isinstance(message, TextMessage):
+            message = message.content
+        messages.append(str(message))
+        st.session_state.investment_house.append(message)
+        with chat_placeholder:
+            st.markdown("\n".join(map(str, st.session_state.investment_house)), unsafe_allow_html=True)
 
-    messages = result.messages
-
+        await asyncio.sleep(0.1)  # Allow UI update
     try:
         summary_message = TextMessage(
             content=f"Summarize this discussion:\n{messages} and conclude a final investment decision.", 
