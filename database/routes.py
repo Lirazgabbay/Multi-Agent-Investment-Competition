@@ -11,6 +11,10 @@ from database.api_call import APICall
 from database.get_api_call_request import GetAPICallRequest
 import json
 
+from database.api_call import APICall
+from database.get_api_call_request import GetAPICallRequest
+
+
 app = FastAPI()
 
 def get_db():
