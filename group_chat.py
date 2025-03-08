@@ -135,25 +135,25 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         if isinstance(event, (ModelClientStreamingChunkEvent, ToolCallRequestEvent, ToolCallExecutionEvent)):
             continue  # Ignore tool execution events
 
-        # Extract agent name properly
         agent_name = getattr(event, "source", "Unknown Agent")
-        if isinstance(agent_name, AgentId):  # If the source is an AgentId object
+        if isinstance(agent_name, AgentId):  
             agent_name = agent_name.type
 
-        # Extract message content
         message_content = getattr(event, "content", str(event))
 
+        messages.append(message_content)
+
         # Format the message
-        formatted_message = f"**{agent_name}:** {message_content}"
+        chat_messages.append({"role": agent_name, "content": message_content}) 
+        
+        with chat_placeholder.container():
+                for msg in chat_messages:
+                    with st.chat_message("assistant"):  
+                        st.write(f"**{msg.get('role', 'Unknown Agent')}**")  
+                        st.markdown(msg.get("content", "")) 
 
-        messages.append(formatted_message)
-        chat_messages.append(formatted_message)
-
-        # Update UI dynamically
-        chat_placeholder.markdown("\n".join(chat_messages), unsafe_allow_html=True)
 
         await asyncio.sleep(0.1)  # Allow UI to update smoothly
-
 
 
     try:
