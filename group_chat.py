@@ -16,7 +16,7 @@ import datetime
 import os
 
 
-async def init_investment_house_discussion(agents_init, stocks_symbol: list[str], budget: float, name: str, start_year: int):
+async def init_investment_house_discussion(agents_init, stocks_symbol: list[str], budget: float, name: str, start_year: int, chat_placeholder):
     """
     Initiates a discussion between all agents in the investment house 
     until a consensus is reached.
@@ -111,19 +111,14 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     The current prices of {stocks_symbol} are {dict_symbol_price}.  
     Please base your analyses on data up to and including {start_year}."""
 
-    chat_placeholder = st.empty()
+    # chat_placeholder = st.empty()
 
-    # Ensure session state variables exist
-    if "house1_messages" not in st.session_state:
-        st.session_state.house1_messages = []
-    if "chat_messages_2" not in st.session_state:
-        st.session_state.chat_messages_2 = []
+    chat_key = "house1_messages" if name == "Investment House 1" else "chat_messages_2"
     
-    if name == "Investment House 1":
-        st.session_state.investment_house = st.session_state.house1_messages
-    else:
-        st.session_state.investment_house = st.session_state.chat_messages_2
-
+    if chat_key not in st.session_state:
+        st.session_state[chat_key] = []
+    
+    chat_messages = st.session_state[chat_key] 
     print("\nStarting conversation:")
     
     # result = await Console(team.run_stream(task=initial_message)
@@ -133,9 +128,10 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         if isinstance(message, TextMessage):
             message = message.content
         messages.append(str(message))
-        st.session_state.investment_house.append(message)
+        chat_messages.append(str(message))
+        # Update UI dynamically for only this investment house
         with chat_placeholder:
-            st.markdown("\n".join(map(str, st.session_state.investment_house)), unsafe_allow_html=True)
+            st.markdown("\n".join(map(str, chat_messages)), unsafe_allow_html=True)
 
         await asyncio.sleep(0.1)  # Allow UI update
     try:

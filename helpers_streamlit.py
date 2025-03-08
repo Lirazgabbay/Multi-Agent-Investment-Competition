@@ -114,7 +114,8 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         stocks.split(","), 
         investment_budget, 
         "Investment House 1", 
-        start_year
+        start_year,
+        house1_chat  
     )
     
     house2_result = await init_investment_house_discussion(
@@ -122,7 +123,8 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         stocks.split(","), 
         investment_budget, 
         "Investment House 2", 
-        start_year
+        start_year,
+        house2_chat
     )
     
     judge_summary = f"House 1: {house1_result}\n\nHouse 2: {house2_result}"
@@ -134,7 +136,8 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         ["Investment House 1", "Investment House 2"], 
         start_year, 
         end_year, 
-        judge_summary
+        judge_summary,
+        house2_chat 
     )
     
     st.session_state.chat_messages_judges.append(judges_result)
