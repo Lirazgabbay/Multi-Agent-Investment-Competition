@@ -2,8 +2,6 @@
 group_chat.py
 This file contains the code for the group chat functionality of the Investment House discussion.
 """
-import datetime
-import os
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_agentchat.teams import SelectorGroupChat
@@ -13,6 +11,7 @@ from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
 import requests
 import datetime
+import os
 
 
 async def init_investment_house_discussion(agents_init, stocks_symbol: list[str], budget: float, name: str, start_year: int):
