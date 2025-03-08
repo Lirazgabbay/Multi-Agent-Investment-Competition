@@ -10,7 +10,6 @@ from finance.LLM_get_financial import quick_ratio
 from finance.agents_functions import competative_func, historical_func, qualitative_func
 from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
 from autogen_ext.models.openai import OpenAIChatCompletionClient
-from autogen_ext.models.openai import OpenAIChatCompletionClient
 from search import google_search
 from autogen_core.tools import FunctionTool
 
@@ -80,9 +79,9 @@ class InitAgents():
             system_message="Provide the consensus that the agents have reached and a short summary on the final decision."
         )
 
-        self.user_proxy = UserProxyAgent(
-            name="User_Proxy"
-        )
+        # self.user_proxy = UserProxyAgent(
+        #     name="User_Proxy"
+        # )
 
 
         self.red_flags_agent = AssistantAgent(
