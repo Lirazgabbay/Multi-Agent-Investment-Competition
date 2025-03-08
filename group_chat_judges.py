@@ -3,15 +3,23 @@ group_chat_judges.py
 This module contains functions to compare and judge the final decisions of investment houses.
 """
 import os
+import asyncio
+from autogen_core import AgentId
+import streamlit as st
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_agentchat.teams import SelectorGroupChat
-from autogen_agentchat.ui import Console
 from autogen_agentchat.messages import TextMessage
 from autogen_ext.models.openai import OpenAIChatCompletionClient
 from dotenv import load_dotenv
 from init_judge_agents import InitJudgeAgent
+from autogen_agentchat.messages import (
+    ModelClientStreamingChunkEvent,
+    ToolCallRequestEvent,
+    ToolCallExecutionEvent
+)
 
-async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: list[str], budget: float, names: list[str], start_year: int, end_year: int, summary: str):
+
+async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: list[str], budget: float, names: list[str], start_year: int, end_year: int, summary: str, chat_placeholder):
     """
     Initiates a discussion between all judges in the investment house 
     until a consensus is reached.
@@ -76,11 +84,43 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
     Let's begin the discussion!
     """
     
+    # Use session state to track messages
+    if "judges_chat" not in st.session_state:
+        st.session_state["judges_chat"] = []
+
+    chat_messages = st.session_state["judges_chat"]
+
+
     print("\nStarting conversation:")
     
-    result = await Console(team.run_stream(task=initial_message))
+    messages = []
+    async for event in team.run_stream(task=initial_message):
+        if isinstance(event, (ModelClientStreamingChunkEvent, ToolCallRequestEvent, ToolCallExecutionEvent)):
+            continue  # Ignore system-generated messages
 
-    messages = result.messages
+        # Extract agent name
+        agent_name = getattr(event, "source", "Unknown Agent")
+        if isinstance(agent_name, str):
+            agent_name = agent_name
+        elif isinstance(agent_name, AgentId):
+            agent_name = agent_name.type  # Extract agent type if it's an object
+
+        # Extract message content
+        message_content = getattr(event, "content", str(event))
+
+        messages.append(message_content)
+
+        # Store message in session state
+        chat_messages.append({"role": agent_name, "content": message_content})
+
+        # Display messages dynamically
+        with chat_placeholder.container():
+            for msg in chat_messages:
+                with st.chat_message("assistant"):  # Display all agents as "assistant"
+                    st.write(f"**{msg.get('role', 'Unknown Agent')}**")  # Show agent name
+                    st.markdown(msg.get("content", ""))  # Display message content
+
+        await asyncio.sleep(0.1)  # Allow UI to update
 
     try:
         summary_message = TextMessage(

@@ -137,14 +137,9 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         start_year, 
         end_year, 
         judge_summary,
-        house2_chat 
+        judges_chat 
     )
     
-    st.session_state.chat_messages_judges.append(judges_result)
-    with judges_chat:
-        st.empty()
-        st.markdown(judges_result, unsafe_allow_html=True)
-
 
 def start_analysis_thread(stocks, investment_budget, start_year, end_year, house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges):
     """Starts AI analysis in a separate thread."""
