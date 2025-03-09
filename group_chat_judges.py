@@ -113,6 +113,9 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
         # Store message in session state
         chat_messages.append({"role": agent_name, "content": message_content})
 
+        if "TaskResult" in message_content:
+            continue 
+        
         # Display messages dynamically
         with chat_placeholder.container():
             for msg in chat_messages:

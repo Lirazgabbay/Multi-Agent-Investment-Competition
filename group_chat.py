@@ -3,6 +3,7 @@ group_chat.py
 This file contains the code for the group chat functionality of the Investment House discussion.
 """
 import asyncio
+import contextlib
 from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.conditions import MaxMessageTermination, TextMentionTermination
 from autogen_agentchat.teams import SelectorGroupChat
@@ -15,6 +16,7 @@ import streamlit as st
 import requests
 import datetime
 import os
+import io
 from autogen_agentchat.messages import (
     ModelClientStreamingChunkEvent,
     ToolCallRequestEvent,
@@ -117,7 +119,6 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     The current prices of {stocks_symbol} are {dict_symbol_price}.  
     Please base your analyses on data up to and including {start_year}."""
 
-    # chat_placeholder = st.empty()
 
     chat_key = "house1_messages" if name == "Investment House 1" else "chat_messages_2"
     
@@ -126,9 +127,7 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     
     chat_messages = st.session_state[chat_key] 
     print("\nStarting conversation:")
-    
-    # result = await Console(team.run_stream(task=initial_message)
-    # messages = result.messages
+
     messages = []
     async for event in team.run_stream(task=initial_message):
         # Skip system-generated messages (function calls, tool execution logs)
@@ -145,17 +144,19 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
 
         # Format the message
         chat_messages.append({"role": agent_name, "content": message_content}) 
+      
+        if "TaskResult" in message_content:
+            continue 
         
         with chat_placeholder.container():
-                for msg in chat_messages:
-                    with st.chat_message("assistant"):  
-                        st.write(f"**{msg.get('role', 'Unknown Agent')}**")  
-                        st.markdown(msg.get("content", "")) 
-
+            for msg in chat_messages:
+                with st.chat_message("assistant"):  
+                    st.write(f"**{msg.get('role', 'Unknown Agent')}**")  
+                    st.markdown(msg.get("content", ""))
 
         await asyncio.sleep(0.1)  # Allow UI to update smoothly
 
-
+    
     try:
         summary_message = TextMessage(
             content=f"Summarize this discussion:\n{messages} and conclude a final investment decision.", 
@@ -169,6 +170,8 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         
         # Extract the content from the response
         if hasattr(summary_response, 'chat_message') and hasattr(summary_response.chat_message, 'content'):
+            summary_text = summary_response.chat_message.content
+            chat_messages.append({"role": "Summary Agent", "content": summary_text})
             return summary_response.chat_message.content
         else:
             return "A summary could not be generated in the expected format."
