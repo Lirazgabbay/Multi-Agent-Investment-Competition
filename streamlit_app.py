@@ -7,7 +7,6 @@ from helpers_streamlit import (
 )
 import init_agents
 import init_judge_agents
-from styles import load_custom_styles
 from app_constants import BUDGET, TICKER_STOCKS, START_YEAR, END_YEAR
 
 init_db("stock_trading.db")
@@ -22,7 +21,6 @@ st.set_page_config(page_title="Investment Analysis", page_icon="📈", layout="w
 st.title("📊 Investment Houses Competition")
 st.subheader("Multi-Agent Investment Analysis & Judging System")
 
-load_custom_styles()
 initialize_session_state()
 
 # Sidebar Inputs
