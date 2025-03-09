@@ -13,7 +13,7 @@ from finance.judge_profit import judge_profit, get_historical_data, find_closest
 def mock_historical_data():
     """Sample historical data fixture with price information for testing."""
     return {
-        "symbol": "AAPL",
+        "symbol": "GOOG",
         "historical": [
             {"date": "2022-12-31", "close": 150.00},
             {"date": "2022-12-30", "close": 149.50},
@@ -31,7 +31,7 @@ def test_get_historical_data_success(mock_cached_api_request, mock_historical_da
     mock_cached_api_request.return_value = json.dumps(mock_historical_data)
     
     # Call the function
-    result = get_historical_data("AAPL")
+    result = get_historical_data("GOOG")
     
     # Assert the function was called with the correct parameters
     mock_cached_api_request.assert_called_once()
@@ -40,7 +40,7 @@ def test_get_historical_data_success(mock_cached_api_request, mock_historical_da
     
     # Assert the result matches our mock data
     assert result == mock_historical_data
-    assert result['symbol'] == "AAPL"
+    assert result['symbol'] == "GOOG"
     assert len(result['historical']) == 5
 
 
@@ -51,7 +51,7 @@ def test_get_historical_data_invalid_json(mock_cached_api_request):
     mock_cached_api_request.return_value = "Not a valid JSON"
     
     # Call the function
-    result = get_historical_data("AAPL")
+    result = get_historical_data("GOOG")
     
     # Assert the result is None due to JSON parsing error
     assert result is None
@@ -85,13 +85,13 @@ def test_judge_profit_calculation(mock_get_historical_data, mock_historical_data
     mock_get_historical_data.return_value = mock_historical_data
     
     # Call the function with $10,000 investment
-    profit = judge_profit("AAPL", 10000)
+    profit = judge_profit("GOOG", 10000)
     
     # Calculate expected result manually:
-    # $10,000 invested at $150 per share = 66.67 shares
-    # 66.67 shares at $200 per share = $13,334
-    # Profit = $13,334 - $10,000 = $3,334
-    expected_profit = 3333.33  # Slight difference due to rounding
+    # $10,000 invested at $150 per share = 66 shares
+    # 66 shares at $200 per share = $13,200
+    # Profit = $13,200 - $10,000 = $3,200
+    expected_profit = 3200 
     
     # Assert the result is close to our expected value
     assert pytest.approx(profit, abs=0.01) == expected_profit
@@ -106,7 +106,7 @@ def test_judge_profit_uses_closest_date(mock_get_historical_data, mock_historica
     mock_get_historical_data.return_value = modified_data
     
     # Should not raise an error, should use closest date
-    result = judge_profit("AAPL", 10000)
+    result = judge_profit("GOOG", 10000)
     assert result is not None
 
 @patch('finance.judge_profit.get_historical_data')
@@ -117,7 +117,7 @@ def test_judge_profit_no_dates(mock_get_historical_data, mock_historical_data):
     mock_get_historical_data.return_value = modified_data
     
     with pytest.raises(ValueError, match="Could not retrieve stock prices"):
-        judge_profit("AAPL", 10000)
+        judge_profit("GOOOG", 10000)
 
 
 @patch('finance.judge_profit.get_historical_data')
@@ -128,7 +128,7 @@ def test_judge_profit_no_historical_data(mock_get_historical_data):
     
     # Assert the function raises a ValueError
     with pytest.raises(ValueError, match="Could not retrieve historical data"):
-        judge_profit("AAPL", 10000)
+        judge_profit("GOOG", 10000)
 
 
 @patch('finance.judge_profit.get_historical_data')
@@ -143,13 +143,13 @@ def test_judge_profit_negative_return(mock_get_historical_data, mock_historical_
     mock_get_historical_data.return_value = modified_data
     
     # Call the function
-    profit = judge_profit("AAPL", 10000)
+    profit = judge_profit("GOOG", 10000)
     
     # Calculate expected result:
-    # $10,000 invested at $150 per share = 66.67 shares
-    # 66.67 shares at $100 per share = $6,667
-    # Profit = $6,667 - $10,000 = -$3,333
-    expected_profit = -3333.33
+    # $10,000 invested at $150 per share = 66 shares
+    # 66 shares at $100 per share = $6,600
+    # Profit = $6,600 - $10,000 = -$3,400
+    expected_profit = -3400
     
     # Assert the result is close to our expected negative value
     assert pytest.approx(profit, abs=0.01) == expected_profit
