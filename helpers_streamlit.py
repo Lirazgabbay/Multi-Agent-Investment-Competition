@@ -21,10 +21,12 @@ def is_fastapi_running():
             return True
     return False
 
+
 def is_port_in_use(port: int) -> bool:
     """Checks if a port is already occupied."""
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex(("localhost", port)) == 0
+
 
 def run_fastapi():
     """Starts FastAPI only if it's not already running."""
@@ -58,6 +60,7 @@ def start_fastapi_server():
         fastapi_thread.start()
     wait_for_fastapi()
 
+
 # init streamlit session state
 def initialize_session_state():
     """Ensures all session state variables are initialized."""
@@ -65,34 +68,6 @@ def initialize_session_state():
     st.session_state.setdefault("chat_messages_2", [])
     st.session_state.setdefault("chat_messages_judges", [])
 
-
-async def stream_messages(agent_function, chat_key, chat_container, *args):
-    """Streams messages to the UI dynamically with real-time updates."""
-    if chat_key not in st.session_state:
-        st.session_state[chat_key] = []
-    
-    # Call the coroutine function
-    result = await agent_function(*args)
-    
-    if isinstance(result, str):
-        st.session_state[chat_key].append(result)
-        st.experimental_rerun()
-    elif hasattr(result, '__iter__') and not isinstance(result, str):
-        for message in result:
-            st.session_state[chat_key].append(message)
-            with chat_container:
-                # Display all messages collected so far
-                for i, msg in enumerate(st.session_state[chat_key]):
-                    message_key = f"{chat_key}_{i}"
-                    st.markdown(msg, unsafe_allow_html=True, key=message_key)
-            # Small delay to allow UI to update
-            await asyncio.sleep(0.2)
-            # Force a rerun to update the UI
-            st.experimental_rerun()
-    else:
-        message = str(result)
-        st.session_state[chat_key].append(message)
-        st.experimental_rerun()
                     
 async def run_analysis(stocks, investment_budget, start_year, end_year, house1_chat, house2_chat, judges_chat, investment_house1, investment_house2, judges):
     """Runs AI analysis asynchronously with better UI updates."""
