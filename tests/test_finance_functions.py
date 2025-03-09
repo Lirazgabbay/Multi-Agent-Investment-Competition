@@ -125,7 +125,7 @@ def test_price_to_EBIT_ratio_no_market_cap(mock_requests_get):
         Mock(status_code=200, json=Mock(return_value=[{'calendarYear': '2022', 'operatingIncome': 50000000}])),  # Mock income statement response
     ]
 
-    result = price_to_EBIT_ratio("AAPL", 2022)
+    result = price_to_EBIT_ratio("GOOG", 2022)
     assert result is None
 
 
@@ -136,7 +136,7 @@ def test_price_to_EBIT_ratio_no_ebit(mock_requests_get):
         Mock(status_code=200, json=Mock(return_value=[{'calendarYear': '2022', 'operatingIncome': None}])),  # Mock income statement response with no EBIT
     ]
 
-    result = price_to_EBIT_ratio("AAPL", 2022)
+    result = price_to_EBIT_ratio("GOOG", 2022)
     assert result is None
 
 
@@ -147,7 +147,7 @@ def test_price_to_EBIT_ratio_zero_ebit(mock_requests_get):
         Mock(status_code=200, json=Mock(return_value=[{'calendarYear': '2022', 'operatingIncome': 0}])),  # Mock income statement response with zero EBIT
     ]
 
-    result = price_to_EBIT_ratio("AAPL", 2022)
+    result = price_to_EBIT_ratio("GOOG", 2022)
     assert result is None
 
 
@@ -158,7 +158,7 @@ def test_price_to_EBIT_ratio_no_data(mock_requests_get):
         Mock(status_code=404, json=Mock(return_value=[])),  # Mock failure for income statement response
     ]
 
-    result = price_to_EBIT_ratio("AAPL", 2022)
+    result = price_to_EBIT_ratio("GOOG", 2022)
     assert result is None
 
 
@@ -172,5 +172,5 @@ def test_ratios_no_data(mock_requests_get):
         "priceToSalesRatio": 2.8
     }]))
 
-    result = ratios("AAPL", 2022)
+    result = ratios("GOOG", 2022)
     assert result is None
