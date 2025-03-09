@@ -4,7 +4,6 @@ uvicorn>=0.22.0
 starlette>=0.27.0
 
 # Database
-sqlite3
 psutil
 
 # HTTP Requests & API Clients
@@ -16,8 +15,7 @@ python-dotenv>=1.0.0
 pytest>=7.3.1
 pytest-asyncio  
 pytest-mock>=3.10.0
-unittest  
-unittest.mock  
+
 
 # Web Scraping & Streamlit UI
 beautifulsoup4>=4.12.2 
