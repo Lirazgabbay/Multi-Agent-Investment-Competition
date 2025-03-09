@@ -27,13 +27,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install --no-cache-dir -r requirements.txt
 
-
       - name: Set Environment Variables
         run: |
           echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
           echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
           echo "FMP_API_KEY=${{ secrets.FMP_API_KEY }}" >> $GITHUB_ENV
           echo "POLYGON_API_KEY=${{ secrets.POLYGON_API_KEY }}" >> $GITHUB_ENV
+
+      - name: Create Temporary .env File
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > .env
+          echo "FMP_API_KEY=${{ secrets.FMP_API_KEY }}" >> .env
+          echo "POLYGON_API_KEY=${{ secrets.POLYGON_API_KEY }}" >> .env
 
       - name: Run Pytest
         run: |
@@ -46,3 +51,7 @@ jobs:
         with:
           name: pytest_results
           path: log_tests.txt
+
+      - name: Cleanup .env File
+        if: always()
+        run: rm -f .env
