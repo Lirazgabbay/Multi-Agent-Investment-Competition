@@ -1,13 +1,35 @@
-pytest>=7.3.1
-starlette>=0.27.0
+# Web framework & API
 fastapi>=0.95.1
 uvicorn>=0.22.0
+starlette>=0.27.0
+
+# Database
+sqlite3
+psutil
+
+# HTTP Requests & API Clients
 requests>=2.29.0
-python-dotenv>=1.0.0
-pydantic>=1.10.7
-beautifulsoup4>=4.12.2
-httpx>=0.25.0
-tiktoken>=0.5.0
-openai>=1.0.0
-autogen_agentchat
+httpx>=0.25.0  
+python-dotenv>=1.0.0  
+
+# Testing & Mocking
+pytest>=7.3.1
+pytest-asyncio  
+pytest-mock  
+unittest  
+unittest.mock  
+
+# Web Scraping & Streamlit UI
+beautifulsoup4>=4.12.2 
+streamlit>=1.20.0  
+
+# AI & Autogen Agents
+openai>=1.0.0 
+tiktoken>=0.5.0 
+autogen_agentchat 
+autogen_core  
 autogen_ext
+
+# Utilities & Typing
+pydantic>=1.10.7 
+typing-extensions

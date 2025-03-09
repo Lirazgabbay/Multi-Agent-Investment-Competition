@@ -27,6 +27,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt  
 
+      - name: Set Environment Variables
+        run: |
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          echo "FMP_API_KEY=${{ secrets.FMP_API_KEY }}" >> $GITHUB_ENV
+          echo "POLYGON_API_KEY=${{ secrets.POLYGON_API_KEY }}" >> $GITHUB_ENV
+
       - name: Run Pytest
         run: |
           export PYTHONPATH=$PYTHONPATH:$(pwd)
