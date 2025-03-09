@@ -1,0 +1,39 @@
+name: CI/CD for Stock Trading AI with SQLite Deployment on Azure Container
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:  
+  tests:
+    name: Run Pytest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt  
+
+      - name: Run Pytest
+        run: |
+          pytest -v tests/ --tb=short | tee log_tests.txt
+        continue-on-error: true
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest_results
+          path: log_tests.txt
