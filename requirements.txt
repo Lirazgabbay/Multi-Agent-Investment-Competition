@@ -8,5 +8,6 @@ pydantic>=1.10.7
 beautifulsoup4>=4.12.2
 httpx>=0.25.0
 tiktoken>=0.5.0
+openai>=1.0.0
 autogen_agentchat
 autogen_ext
