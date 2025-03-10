@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 import json
 
+from app_constants import START_YEAR
 from database.api_utils import cached_api_request
 
 def extract_business_info(symbol: str) -> dict:
@@ -50,13 +51,13 @@ def get_company_data(symbol: str, limit: int = 2) -> dict:
         dict: A dictionary containing news articles related to the company.
     """
     response_text = cached_api_request(
-        url=f"https://api.polygon.io/v2/reference/news",
+        url=f"https://api.polygon.io/v2/reference/news?published_utc={START_YEAR}",
         api_key_name="POLYGON_API_KEY",
         api_key_in_url=True,
         api_key_param="apiKey",
         params={"ticker": symbol, "limit": limit}
     )
-
+    print(response_text)
     try:
         data = json.loads(response_text)
         news = data.get("results", [])
@@ -76,3 +77,4 @@ def get_company_data(symbol: str, limit: int = 2) -> dict:
         return json.dumps({"error": "Failed to parse API response as JSON"})
     except Exception as e:
         return json.dumps({"error": f"Error processing API response: {str(e)}"})
+
