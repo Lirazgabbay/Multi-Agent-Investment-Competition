@@ -3,12 +3,13 @@ agents_functions.py
 This file contains wrapper functions that the agents will use to interact with the finance module. 
 These functions will be called by the agents to get financial data and perform analysis.
 """
+from app_constants import START_YEAR
 from finance.LLM_get_financial import get_related_companies
 from finance.LLM_get_qualitative import extract_business_info, get_company_data
 from finance.profit_margin import calculate_profit_margins
 from finance.profit_multipliers import price_to_EBIT_ratio, ratios
 
-def historical_func(symbols: list, years: list):
+def historical_func(symbols: list, years: list[int]):
     """
     receives a list of symbols and a list of years and returns a dictionary with the historical data for each symbol
 
@@ -61,7 +62,7 @@ def competative_func(symbol: str, years: list[int]):
     return results
 
 
-def qualitative_func(symbols: list):
+def qualitative_func(symbols: list, year: int = START_YEAR):
     """
     receives a list of symbols and returns a dictionary with the qualitative data for each symbol
     
@@ -73,7 +74,7 @@ def qualitative_func(symbols: list):
     for symbol in symbols:
         results[symbol] = {
             "business_info": extract_business_info(symbol),
-            "company_data": get_company_data(symbol),
+            "company_data": get_company_data(symbol, year),
         }
 
     return results

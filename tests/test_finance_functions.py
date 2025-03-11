@@ -65,7 +65,7 @@ def test_competative_func_invalid():
 def test_qualitative_func():
     """Test the qualitative_func function with valid input data to ensure it returns the expected results."""
     symbols = ["AAPL", "GOOGL"]
-    result = qualitative_func(symbols)
+    result = qualitative_func(symbols, 2022)
     assert isinstance(result, dict)
     assert "AAPL" in result and "GOOGL" in result
     assert "business_info" in result["AAPL"]
