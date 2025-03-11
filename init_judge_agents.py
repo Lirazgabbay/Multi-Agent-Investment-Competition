@@ -14,7 +14,7 @@ from autogen_core.tools import FunctionTool
 class InitJudgeAgent():
     def __init__(self):
         load_dotenv()
-        api_key_open_AI = os.getenv('OPEN_AI_API_KEY')
+        api_key_open_AI = os.getenv('OPENAI_API_KEY')
         self.model_client = OpenAIChatCompletionClient(
             model='gpt-3.5-turbo',
             api_key=api_key_open_AI,

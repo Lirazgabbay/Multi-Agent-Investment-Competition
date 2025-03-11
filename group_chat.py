@@ -39,7 +39,7 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
         dict: A summary of the final decision and key discussion points.
     """
     load_dotenv()
-    api_key_open_AI = os.getenv('OPEN_AI_API_KEY')
+    api_key_open_AI = os.getenv('OPENAI_API_KEY')
     model_client = OpenAIChatCompletionClient(
         model="gpt-4o-2024-08-06",
         api_key=api_key_open_AI,

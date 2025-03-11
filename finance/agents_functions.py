@@ -8,8 +8,9 @@ from finance.LLM_get_financial import get_related_companies
 from finance.LLM_get_qualitative import extract_business_info, get_company_data
 from finance.profit_margin import calculate_profit_margins
 from finance.profit_multipliers import price_to_EBIT_ratio, ratios
+from typing import List
 
-def historical_func(symbols: list, years: list[int]):
+def historical_func(symbols: list, years: List[int]):
     """
     receives a list of symbols and a list of years and returns a dictionary with the historical data for each symbol
 
@@ -30,7 +31,7 @@ def historical_func(symbols: list, years: list[int]):
     return results
 
 
-def competative_func(symbol: str, years: list[int]):
+def competative_func(symbol: str, years: List[int]):
     """
     Receives a symbol and a list of years and returns a dictionary with the competitive data for the symbol.
 

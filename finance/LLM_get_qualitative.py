@@ -39,12 +39,13 @@ def extract_business_info(symbol: str) -> dict:
         return json.dumps({"error": f"Error processing API response: {str(e)}"})
 
 
-def get_company_data(symbol: str, limit: int = 2) -> dict:
+def get_company_data(symbol: str,year:int, limit: int = 2) -> dict:
     """
     Fetches recent news articles related to a company using Polygon.io API.
 
     Args:
         ticker (str): The stock ticker symbol.
+        year ()
         limit (int): The number of articles to retrieve (default: 2).
 
     Returns:
