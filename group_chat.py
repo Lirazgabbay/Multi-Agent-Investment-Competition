@@ -48,25 +48,22 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     )
     
     text_termination = TextMentionTermination("TERMINATE")
-    max_messages = MaxMessageTermination(max_messages=30)
+    max_messages = MaxMessageTermination(max_messages=40)
     termination = text_termination | max_messages
     
     selector_prompt = """You are a coordinator of a financial analysis discussion.
-    The first speaker must always be the **liquidity_agent**. 
-    The groupchat order should follow:
+    - The following roles are available: {roles}.
+    - The groupchat order should usually follow:
     liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> search_agent -> red_flags_agent_liquidity -> search_agent -> liquidity_agent -> solid_agent -> search_agent -> Pro_Investment_agent -> search_agent -> manager_agent.
-    Note: liquidity_agent is the first speaker
-    Only after manager_agent speaks, follow the order dynamically based on the discussion.
+    - make sure each agent get its turn to speak, and you can change the order dynamically based on the discussion.
+
+    {history}
+    Read the above conversation. Then select the best fit as the next speaker from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE.
 
     -   If there is a deadlock, or a consensus has reached - the manager_agent should intervene.
     -   If the manager calls all the team members to provide final decision, they should provide their decision in this order:
         liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> red_flags_agent_liquidity -> Pro_Investment_agent -> solid_agent
-
-    Now, given the current context and debate - select the most appropriate next speaker.
-    The following roles are available: {roles}.
-
-    {history}
-    Read the above conversation. Then select the next role from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE."""
+    """
 
     team = SelectorGroupChat(
         participants=[
@@ -109,12 +106,13 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     Each agent should:  
     - Respond to each other when challenging perspectives.  
     - Execute only their designated function calls and analyze the data accordingly.  
-    - Return a final decision and the recommended investment amount at the end of the discussion.  
+    - Return a final decision and the recommended investment amount (percentage of the budget).
 
-    The Manager Agent should intervene only as a last resort in the following cases:  
-    - No other agent has a relevant function to execute.  
-    - The conversation reaches a deadlock and no progress is made for two rounds.  
-    - Request from every agent to provide a final decision of investment (percentage from the budget). 
+    The Manager Agent should:
+    - Ensure that ALL 8 KEY AGENTS (liquidity_agent, historical_margin_multiplier_analyst, competative_margin_multiplier_analyst, qualitative_analyst, red_flags_agent, red_flags_agent_liquidity, solid_agent, Pro_Investment_agent) explicitly provide their final percentage recommendation.
+    - Track which agents have provided their final investment percentage and which haven't.
+    - Only conclude the discussion when all 8 key agents have provided their final decision AND they all agree on the same percentage.
+
 
     The current prices of {stocks_symbol} are {dict_symbol_price}.  
     Please base your analyses on data up to and including {start_year}."""
