@@ -2,7 +2,7 @@
 system_messages_judges.py
 This module contains the system messages for the judge agents.
 """
-from app_constants import BUDGET, TICKER_STOCKS, START_YEAR, END_YEAR
+from app_constants import START_YEAR, END_YEAR
 import streamlit as st
 
 start_year = st.session_state.get("START_YEAR", START_YEAR) 

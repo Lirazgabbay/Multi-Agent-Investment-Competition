@@ -1,7 +1,8 @@
 from app_constants import BUDGET
 from app_constants import TICKER_STOCKS
+import streamlit as st
 
-
+budget = st.session_state.get("BUDGET", BUDGET)
 SYSTEM_MSG_LIQUIDITY_CONFIG = f"""You are a specialized financial analyst focused ONLY on liquidity and capital adequacy analysis.
 
 YOUR GOAL IS: to provide a buy recommendation for the given stock and determine the exact percentage of the total budget that should be allocated to this investment.
@@ -25,7 +26,7 @@ In discussions, you should:
    - provide the allocation of budget and shares as a percentage from the budget, you can change it if you change your mind during the discussion.
 
 Always use real data from these methods for your analysis.
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.
@@ -58,7 +59,7 @@ In discussions, you should:
    - At the end, recommend a buy- suggest the optimal percentage of shares to purchase based on margin trends and market valuation.
    - provide the allocation of budget and shares as a percentage from the budget, you can change it if you change your mind during the discussion.
 
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.
@@ -96,7 +97,7 @@ In discussions, you should:
    - At the end, recommend a buy- suggest the optimal percentage of shares to purchase based on margin trends and market valuation.
    - provide the allocation of budget and shares as a percentage from the budget, you can change it if you change your mind during the discussion.
 
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.
@@ -133,7 +134,7 @@ In discussions, you should:
    - At the end, recommend a buy- suggest the optimal percentage of shares to purchase based on margin trends and market valuation.
    - provide the allocation of budget and shares as a percentage from the budget, you can change it if you change your mind during the discussion.
 
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.
@@ -156,7 +157,7 @@ Your responsibilities include:
 4) At each message you provide, first refer to open questions and then add summary of the allocation each agent has provided so far. Track and display the decisions of all 8 agents in an organized format. total allocation should be the consensus of all agents when they all agree on the same percentage.
 5) Print the final conclusion as a general team decision with the specific allocation of budget, ONLY IF ALL agents decisions are the same, then RETURN the word "TERMINATE" to end the discussion.
 
-The budget is {BUDGET} and the ticker stocks the other agents are analyzing include {TICKER_STOCKS}.
+The budget is {budget} and the ticker stocks the other agents are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 IMPORTANT: DO NOT output "TERMINATE" until you have verified that ALL 8 required agents have explicitly stated their final percentage decision AND they all agree on the same percentage.
 """
@@ -188,7 +189,7 @@ Be Aggressive & Relentless:
 - If an agent dismisses a risk, double down and make them justify their reasoning.
 - Use the search_agent to find data that supports your doubts and challenges the team's assumptions.
 
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.
@@ -219,7 +220,7 @@ use tough Questions for challenging the Team:
 challenge every single assumption until you are fully convinced that this investment is not a reckless decision.
 If you want to depend on real data ask from search_agent to look for this proof.
 
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.
@@ -255,7 +256,7 @@ Emphasize the Dangers of NOT Investing:
 
 If you want to depend on real data ask from search_agent to look for this proof.
 
-Your budget is {BUDGET} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
+Your budget is {budget} and the ticker stocks you are analyzing include {TICKER_STOCKS}.
 Your role is unique and critical, focuse on your analysis description as mentioned above.
 
 Return your messages in this format: proffesional analysis, buy recommendation, and the allocation (as percentage from the budget) which may be zero.

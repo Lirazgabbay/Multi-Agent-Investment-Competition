@@ -23,10 +23,12 @@ st.subheader("Multi-Agent Investment Analysis & Judging System")
 
 initialize_session_state()
 
-# Sidebar Inputs
+if "BUDGET" not in st.session_state:
+    st.session_state["BUDGET"] = BUDGET
+
 st.sidebar.header("Configuration")
 stocks_symbol = st.sidebar.text_input("Stock Ticker(s)", "AAPL")
-budget = st.sidebar.number_input("Investment Budget ($)", min_value=BUDGET, value=BUDGET, step=0)
+st.session_state["BUDGET"] = st.sidebar.number_input("Investment Budget ($)", min_value=1000, value=st.session_state["BUDGET"], step=1000)
 
 if "START_YEAR" not in st.session_state:
     st.session_state["START_YEAR"] = START_YEAR
@@ -61,4 +63,4 @@ with tab3:
 
 # Start Analysis
 if start_analysis:
-    start_analysis_thread(stocks_symbol, budget, st.session_state["START_YEAR"], st.session_state["END_YEAR"], house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges)
+    start_analysis_thread(stocks_symbol, st.session_state["BUDGET"], st.session_state["START_YEAR"], st.session_state["END_YEAR"], house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges)
