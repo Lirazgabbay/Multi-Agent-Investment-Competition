@@ -26,8 +26,11 @@ initialize_session_state()
 if "BUDGET" not in st.session_state:
     st.session_state["BUDGET"] = BUDGET
 
+if "TICKER_STOCKS" not in st.session_state:
+    st.session_state["TICKER_STOCKS"] = ", ".join(TICKER_STOCKS)
+
 st.sidebar.header("Configuration")
-stocks_symbol = st.sidebar.text_input("Stock Ticker(s)", "AAPL")
+st.session_state["TICKER_STOCKS"] = st.sidebar.text_input("Stock Ticker(s)", st.session_state["TICKER_STOCKS"])
 st.session_state["BUDGET"] = st.sidebar.number_input("Investment Budget ($)", min_value=1000, value=st.session_state["BUDGET"], step=1000)
 
 if "START_YEAR" not in st.session_state:
@@ -63,4 +66,4 @@ with tab3:
 
 # Start Analysis
 if start_analysis:
-    start_analysis_thread(stocks_symbol, st.session_state["BUDGET"], st.session_state["START_YEAR"], st.session_state["END_YEAR"], house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges)
+    start_analysis_thread(st.session_state["TICKER_STOCKS"], st.session_state["BUDGET"], st.session_state["START_YEAR"], st.session_state["END_YEAR"], house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges)
