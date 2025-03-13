@@ -6,6 +6,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import json
+import streamlit as st
 
 from app_constants import START_YEAR
 from database.api_utils import cached_api_request
@@ -51,8 +52,9 @@ def get_company_data(symbol: str,year:int, limit: int = 2) -> dict:
     Returns:
         dict: A dictionary containing news articles related to the company.
     """
+    start_year = st.session_state.get("START_YEAR", START_YEAR)
     response_text = cached_api_request(
-        url=f"https://api.polygon.io/v2/reference/news?published_utc={START_YEAR}",
+        url=f"https://api.polygon.io/v2/reference/news?published_utc={start_year}",
         api_key_name="POLYGON_API_KEY",
         api_key_in_url=True,
         api_key_param="apiKey",

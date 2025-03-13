@@ -27,10 +27,20 @@ initialize_session_state()
 st.sidebar.header("Configuration")
 stocks_symbol = st.sidebar.text_input("Stock Ticker(s)", "AAPL")
 budget = st.sidebar.number_input("Investment Budget ($)", min_value=BUDGET, value=BUDGET, step=0)
-st.sidebar.header("Time Period")
-start_year = st.sidebar.number_input("Analysis Start Year", min_value=2000, max_value=START_YEAR, value=START_YEAR)
-end_year = st.sidebar.number_input("Evaluation End Year", min_value=START_YEAR, max_value=END_YEAR, value=END_YEAR)
 
+if "START_YEAR" not in st.session_state:
+    st.session_state["START_YEAR"] = START_YEAR
+
+if "END_YEAR" not in st.session_state:
+    st.session_state["END_YEAR"] = END_YEAR
+    
+st.sidebar.header("Time Period")
+st.session_state["START_YEAR"] = st.sidebar.number_input(
+    "Analysis Start Year", min_value=2000, max_value=2024, value=st.session_state["START_YEAR"]
+)
+st.session_state["END_YEAR"] = st.sidebar.number_input(
+    "Evaluation End Year", min_value=st.session_state["START_YEAR"], max_value=2025, value=st.session_state["END_YEAR"]
+)
 start_analysis = st.button("🚀 Start Analysis")
 
 
@@ -51,4 +61,4 @@ with tab3:
 
 # Start Analysis
 if start_analysis:
-    start_analysis_thread(stocks_symbol, budget, start_year, end_year, house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges)
+    start_analysis_thread(stocks_symbol, budget, st.session_state["START_YEAR"], st.session_state["END_YEAR"], house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges)

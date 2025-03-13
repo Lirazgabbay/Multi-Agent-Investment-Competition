@@ -6,6 +6,7 @@ import sys
 import os
 import json
 from datetime import datetime
+import streamlit as st
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -71,8 +72,10 @@ def judge_profit(stock: str, money_invested: float):
     if not historical_data:
         raise ValueError(f"Could not retrieve historical data for {stock}")
     
-    start_date = f"{START_YEAR}-12-31"
-    end_date = f"{END_YEAR}-12-31"
+    start_year = st.session_state.get("START_YEAR", START_YEAR)
+    end_year = st.session_state.get("END_YEAR", END_YEAR)
+    start_date = f"{start_year}-12-31"
+    end_date = f"{end_year}-12-31"
     
     start_stock_price = find_closest_price(historical_data, start_date)
     print(f"Start price for {stock} on {start_date}: ${start_stock_price}")
@@ -95,21 +98,3 @@ def judge_profit(stock: str, money_invested: float):
     print(f"Profit: ${profit:.2f} ({profit_percentage:.2f}%)")
     
     return profit
-
-if __name__ == "__main__":
-    stock = "AAPL"
-    money_invested = 10000
-    
-    try:
-        profit = judge_profit(stock, money_invested)
-        print(f"\nSummary: An investment of ${money_invested:.2f} in {stock} from {START_YEAR} to {END_YEAR}")
-        print(f"would have yielded a profit of ${profit:.2f}")
-    except Exception as e:
-        print(f"Error calculating profit: {e}")
-
-# Main changes:
-# Previous: Made direct API calls to Financial Modeling Prep (FMP) with no caching mechanism
-# New: Uses a caching system via cached_api_request to avoid repeated API calls for the same data
-# added a new function get_historical_data to fetch all historical data for a stock with caching
-# Having the full historical dataset allows for finding the closest available price when an exact date match isn't available
-# Caching the entire historical dataset is more efficient than caching individual date queries

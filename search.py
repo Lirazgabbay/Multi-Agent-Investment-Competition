@@ -9,6 +9,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from app_constants import START_YEAR
+import streamlit as st
 
 
 def google_search(query: str, num_results: int = 2, max_chars: int = 500) -> list:  # type: ignore[type-arg]
@@ -31,7 +32,7 @@ def google_search(query: str, num_results: int = 2, max_chars: int = 500) -> lis
 
     if not api_key or not search_engine_id:
         raise ValueError("API key or Search Engine ID not found in environment variables")
-    before_year = START_YEAR 
+    before_year = st.session_state.get("START_YEAR", START_YEAR) 
     if before_year:
         query += f" before:{before_year}-12-31"
 

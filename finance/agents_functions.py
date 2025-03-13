@@ -9,6 +9,7 @@ from finance.LLM_get_qualitative import extract_business_info, get_company_data
 from finance.profit_margin import calculate_profit_margins
 from finance.profit_multipliers import price_to_EBIT_ratio, ratios
 from typing import List
+import streamlit as st
 
 def historical_func(symbols: list, years: List[int]):
     """
@@ -63,7 +64,7 @@ def competative_func(symbol: str, years: List[int]):
     return results
 
 
-def qualitative_func(symbols: list, year: int = START_YEAR):
+def qualitative_func(symbols: list, year: int = st.session_state.get("START_YEAR", START_YEAR)):
     """
     receives a list of symbols and returns a dictionary with the qualitative data for each symbol
     
