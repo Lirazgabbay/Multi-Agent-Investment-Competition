@@ -51,18 +51,67 @@ async def init_investment_house_discussion(agents_init, stocks_symbol: list[str]
     max_messages = MaxMessageTermination(max_messages=40)
     termination = text_termination | max_messages
     
-    selector_prompt = """You are a coordinator of a financial analysis discussion.
-    - The following roles are available: {roles}.
-    - The groupchat order should usually follow:
-    liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> search_agent -> red_flags_agent_liquidity -> search_agent -> liquidity_agent -> solid_agent -> search_agent -> Pro_Investment_agent -> search_agent -> manager_agent.
-    - make sure each agent get its turn to speak, and you can change the order dynamically based on the discussion.
+    # selector_prompt = """You are a coordinator of a financial analysis discussion.
+    # - The following roles are available: {roles}.
+    # - The groupchat order should usually follow:
+    # liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> search_agent -> red_flags_agent_liquidity -> search_agent -> liquidity_agent -> solid_agent -> search_agent -> Pro_Investment_agent -> search_agent -> manager_agent.
+    # - make sure each agent get its turn to speak, and you can change the order dynamically based on the discussion.
 
-    {history}
-    Read the above conversation. Then select the best fit as the next speaker from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE.
+    # {history}
+    # Read the above conversation. Then select the best fit as the next speaker from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE.
 
-    -   If there is a deadlock, or a consensus has reached - the manager_agent should intervene.
-    -   If the manager calls all the team members to provide final decision, they should provide their decision in this order:
-        liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> red_flags_agent_liquidity -> Pro_Investment_agent -> solid_agent
+    # -   If there is a deadlock, or a consensus has reached - the manager_agent should intervene.
+    # -   If the manager calls all the team members to provide final decision, they should provide their decision in this order:
+    #     liquidity_agent -> historical_margin_multiplier_analyst -> competative_margin_multiplier_analyst -> qualitative_analyst -> red_flags_agent -> red_flags_agent_liquidity -> Pro_Investment_agent -> solid_agent
+    # """
+    
+    selector_prompt = """
+    You are the **coordinator** of a financial analysis discussion.
+    Your role is to dynamically **select the next agent to speak** based on the conversation’s needs.
+
+    ### **🔹 Speaker Selection Rules**
+    1️⃣ **Prioritize Resolving Unanswered Questions**  
+    - If an agent raises a question, **select the best-suited agent to respond** before moving forward.  
+    - Example: If **Red Flags Analyst** questions the **Liquidity Analyst**, Liquidity Analyst should be selected next.  
+
+    2️⃣ **Do NOT Select the Manager Repeatedly**  
+    - The **Manager should only speak when**:
+        - Agents are in disagreement and require mediation.
+        - All agents have provided their final investment decisions and a final consensus check is required.  
+    - **If debate is still ongoing, keep selecting debating agents, NOT the Manager.**  
+
+    3️⃣ **Red Flags Agents Must Always Provide Risks Before Finalization**  
+    - If the **Red Flags Analyst** and **Red Flags Liquidity Analyst** have NOT spoken yet, **they MUST be selected next**.  
+    - If risks are identified, **ensure these risks are debated before finalizing investment recommendations.**  
+
+    4️⃣ **Agents Must Debate Until They Reach the SAME Investment Percentage**  
+    - If agents propose **different investment allocations**, **force them to debate until they agree**.  
+    - **DO NOT select the Manager to finalize the decision if disagreements still exist.**  
+    - Keep selecting debating agents until they reach a shared decision.  
+
+    5️⃣ **Search Agent Should Only Speak If Requested**  
+    - The **Search Agent should NOT be called automatically** unless another agent explicitly asks for external data.  
+
+    6️⃣ **Final Investment Decision Order**  
+    - Once the Manager calls for final investment decisions, agents should respond **in this order**:  
+        `liquidity_agent → historical_margin_multiplier_analyst → competative_margin_multiplier_analyst → qualitative_analyst → red_flags_agent → red_flags_agent_liquidity → pro_investment_agent → solid_agent`  
+    - If agents provide **different investment percentages**, force them to debate until they align.  
+
+    ---
+
+    ### **🔹 Decision Logic**
+    {history}  
+    Read the conversation above. **Now select the next agent to speak from {participants}** based on the rules.  
+
+    🚫 **DO NOT select the Manager unless**:
+    - There is a **clear deadlock** and mediation is needed.  
+    - All agents have spoken, and a final consensus check is required.  
+
+    ✔ **Prioritize agents who need to respond to unresolved questions or debates.**  
+    💬 **If agents disagree, keep selecting debating agents until they agree.**  
+    ✅ **Select the Manager ONLY when consensus is near or final checks are needed.**  
+
+    ONLY RETURN THE ROLE.
     """
 
     team = SelectorGroupChat(

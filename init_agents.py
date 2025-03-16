@@ -5,7 +5,7 @@ This module contains the InitAgents class that initializes all the agents requir
 
 import os
 from dotenv import load_dotenv
-from config.system_messages import SYS_MSG_MANAGER_CONFIG, SYS_MSG_PRO_INVEST, SYS_MSG_SOLID_AGENT, SYSTEM_MSG_COMPETATIVE_MARGIN_MULTIPLIER_CONFIG, SYSTEM_MSG_HISTORICAL_MARGIN_MULTIPLIER_CONFIG, SYSTEM_MSG_LIQUIDITY_CONFIG, SYSTEM_MSG_QUALITATIVE_CONFIG, SYS_MSG_PRO_INVEST,SYS_MSG_RED_FLAGS
+from config.system_messages import SYS_MSG_MANAGER_CONFIG, SYS_MSG_PRO_INVEST, SYS_MSG_SOLID_AGENT, SYS_RED_FLAGS_AGENT_LIQUIDITY, SYSTEM_MSG_COMPETATIVE_MARGIN_MULTIPLIER_CONFIG, SYSTEM_MSG_HISTORICAL_MARGIN_MULTIPLIER_CONFIG, SYSTEM_MSG_LIQUIDITY_CONFIG, SYSTEM_MSG_QUALITATIVE_CONFIG, SYS_MSG_PRO_INVEST,SYS_MSG_RED_FLAGS
 from finance.LLM_get_financial import quick_ratio
 from finance.agents_functions import competative_func, historical_func, qualitative_func
 from autogen_agentchat.agents import AssistantAgent, UserProxyAgent
@@ -19,7 +19,7 @@ class InitAgents():
         load_dotenv()
         api_key_open_AI = os.getenv('OPENAI_API_KEY')
         self.model_client = OpenAIChatCompletionClient(
-            model='gpt-3.5-turbo',
+            model='gpt-4o-2024-08-06',
             api_key=api_key_open_AI,
         )
 
@@ -79,11 +79,6 @@ class InitAgents():
             system_message="Provide the consensus that the agents have reached and a short summary on the final decision."
         )
 
-        # self.user_proxy = UserProxyAgent(
-        #     name="User_Proxy"
-        # )
-
-
         self.red_flags_agent = AssistantAgent(
             name="Red_Flags_Analyst",
             model_client=self.model_client,
@@ -102,7 +97,7 @@ class InitAgents():
             name="Red_Flags_Analyst_Liquidity",
             model_client=self.model_client,
             description="Identifies potential risks and problems with the analysis.",
-            system_message="Ask the liquidity_agent how inventory growth rate to revenue growth rate can influace the liquidity analysis? and ask the search_agent to search for information that supports your doubts."
+            system_message=SYS_RED_FLAGS_AGENT_LIQUIDITY
         )
 
         self.pro_investment_agent = AssistantAgent(
