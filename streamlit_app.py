@@ -21,6 +21,27 @@ st.set_page_config(page_title="Investment Analysis", page_icon="📈", layout="w
 st.title("📊 Investment Houses Competition")
 st.subheader("Multi-Agent Investment Analysis & Judging System")
 
+# Load external CSS
+with open("style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
+st.markdown(
+    """
+    <div class="intro-container">
+        <div class="intro-title">📈 Step into the Future of Investment Strategy!</div>
+        <div class="intro-text">
+            Welcome to the <span class="intro-highlight">Investment Houses Competition</span> – where
+            <span class="intro-highlight">AI-driven multi-agent analysis</span> meets real-world financial decision-making.
+            Our system simulates real-world investment scenarios, empowering analysts to assess financial opportunities with precision.
+        </div>
+        <div class="divider"></div>
+        <div class="intro-title">Are you ready?</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
 initialize_session_state()
 
 if "BUDGET" not in st.session_state:
