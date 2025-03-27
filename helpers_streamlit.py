@@ -92,7 +92,8 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         start_year,
         house1_chat  
     )
-    
+    save_discussion_to_file(1, house1_result['full_discussion'])
+
     house2_result = await init_investment_house_discussion(
         investment_house2, 
         stocks.split(","), 
@@ -101,9 +102,11 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         start_year,
         house2_chat
     )
-    
-    judge_summary = f"House 1: {house1_result}\n\nHouse 2: {house2_result}"
-    
+    save_discussion_to_file(2, house2_result['full_discussion']) 
+
+    judge_summary = f"House 1: {house1_result['summary']}\n\nHouse 2: {house2_result['summary']}"
+
+
     judges_result = await init_judges_discussion(
         judges, 
         stocks.split(","), 
@@ -115,6 +118,14 @@ async def run_analysis(stocks, investment_budget, start_year, end_year, house1_c
         judges_chat 
     )
     
+def save_discussion_to_file(house_id: int, messages: list[dict]):
+    filename = f"house{house_id}_discussion.txt"
+    with open(filename, "w", encoding="utf-8") as f:
+        for msg in messages:
+            role = msg.get("role", "Unknown")
+            content = msg.get("content", "")
+            f.write(f"[{role}]: {content}\n\n")
+
 
 def start_analysis_thread(stocks, investment_budget, start_year, end_year, house1_chat, house2_chat, judges_chat, Investment_house1, Investment_house2, judges):
     """Starts AI analysis in a separate thread."""
