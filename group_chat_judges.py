@@ -44,6 +44,7 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
         temperature=0.3,
         timeout=600
     )
+
     
     text_termination = TextMentionTermination("TERMINATE")
     max_messages = MaxMessageTermination(max_messages=30)
@@ -52,7 +53,7 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
     selector_prompt = """You are a coordinator of a the final judgement discussion.
     The first speaker must always be the **Manager**. 
     The groupchat order should be as follows:
-    manager -> profit_judge -> web_surfer -> manager.
+    manager -> decision_quality_judge -> profit_judge -> web_surfer -> manager.
     
     {history}
     Read the above conversation. Then select the next role from {participants} to play according to the relevant info and debate. ONLY RETURN THE ROLE.
@@ -60,6 +61,7 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
     
     team = SelectorGroupChat(
         participants=[
+            init_judges.decision_quality_judge,
             init_judges.profit_judge,
             init_judges.web_surfer,
             init_judges.manager_agent
@@ -68,7 +70,7 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
         termination_condition=termination,
         selector_prompt=selector_prompt,
         allow_repeated_speaker=True,
-        max_selector_attempts=3
+        max_selector_attempts=10
     )
 
     initial_message = f"""Welcome to the final judgement discussion for the investment houses: {names}.
@@ -77,9 +79,21 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
     The budget for the investment was for both houses: {budget}.
     The money was invested is: {budget} multiplied by the percentage that was allocated to the stock by the investment house.
     The given start year was: {start_year}.
+    
     Extract the final decisions of both houses from the summary massage: {summary}.
+    
     The end year you can use for your judgement is: {end_year}.
-    Manager judge, use the profit judge and web surfer to help you make the final decision.
+    
+    Your judging team includes:
+    - Profit Judge: Evaluates the actual profit made by each house using performance metrics.
+    - Web Surfer: Provides external information about company events and macroeconomic factors that occurred after {start_year}.
+    - Decision Quality Judge: Evaluates how complete, logical, and well-structured each house's internal decision-making process was. They may use the tool `get_investment_house_discussion(house_id)` to retrieve full internal discussions.
+
+    Manager, guide this judging discussion by:
+    1. Asking each judge for their analysis.
+    2. Comparing both houses using all three perspectives: profit, decision quality, and external events.
+    3. Delivering a final verdict on which house made the better decision, and why.
+    
     Determine which investment house made the best decision and why.
     Let's begin the discussion!
     """
