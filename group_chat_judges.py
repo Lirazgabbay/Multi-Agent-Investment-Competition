@@ -37,21 +37,43 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
         dict: A summary of the final decision verdict for each investment house.
     """
     load_dotenv()
+    # api_key_openrouter = os.getenv('OPENROUTER_API_KEY')
+    # model_client = OpenAIChatCompletionClient(
+    #     model="openai/gpt-4o-mini",
+    #     base_url="https://openrouter.ai/api/v1",
+    #     api_key=api_key_openrouter,
+    #     extra_headers={
+    #         "HTTP-Referer": "http://localhost:8000",
+    #         "X-Title": "Investment Analysis App"
+    #     },
+    #     model_info={
+    #         "completion_parser": "openai",
+    #         "chat_parser": "openai",
+    #         "use_system_prompt": True,
+    #         "function_calling": False,
+    #         "supports_function_calling": False,
+    #         "supports_vision": False,
+    #         "vision": False,
+    #         "json_output": False,
+    #         "family": "gpt-4o-mini"
+    #     }
+    # )
+    
     api_key_open_AI = os.getenv('OPENAI_API_KEY')
-    model_client = OpenAIChatCompletionClient(
-        model="gpt-4o-2024-08-06",
+    selector_model_client = OpenAIChatCompletionClient(
+        model="gpt-3.5-turbo",
         api_key=api_key_open_AI,
-        temperature=0.3,
+        temperature=0.1,
         timeout=600
     )
 
-    
+
     text_termination = TextMentionTermination("TERMINATE")
     max_messages = MaxMessageTermination(max_messages=30)
     termination = text_termination | max_messages
     
     selector_prompt = """You are a coordinator of a the final judgement discussion.
-    The first speaker must always be the **Manager**. 
+    The first speaker MUST ALWAYS be the **Manager**. 
     The groupchat order should be as follows:
     manager -> decision_quality_judge -> profit_judge -> web_surfer -> manager.
     
@@ -66,7 +88,7 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
             init_judges.web_surfer,
             init_judges.manager_agent
         ],
-        model_client=model_client,
+        model_client=selector_model_client,
         termination_condition=termination,
         selector_prompt=selector_prompt,
         allow_repeated_speaker=True,
@@ -152,10 +174,23 @@ async def init_judges_discussion(init_judges: InitJudgeAgent, stocks_symbol: lis
         
         # Extract the content from the response
         if hasattr(summary_response, 'chat_message') and hasattr(summary_response.chat_message, 'content'):
-            return summary_response.chat_message.content
+            # return summary_response.chat_message.content
+            return {
+                "summary": summary_response.chat_message.content,
+                "full_discussion": chat_messages  # This is the list of messages
+            }
         else:
-            return "A summary could not be generated in the expected format."
+            # return "A summary could not be generated in the expected format."
+            return {
+                "summary": "Summary not available.",
+                "full_discussion": chat_messages
+            }
+
             
     except Exception as e:
         print(f"Error generating summary: {e}")
-        return f"The discussion about {stocks_symbol} included multiple messages from the team. A formal summary could not be generated due to a technical issue."
+        error_message = f"The discussion about {stocks_symbol} included multiple messages from the team. A formal summary could not be generated due to a technical issue."
+        return {
+            "summary": error_message,
+            "full_discussion": chat_messages
+        }
