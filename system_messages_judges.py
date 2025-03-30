@@ -7,6 +7,7 @@ import streamlit as st
 
 start_year = st.session_state.get("START_YEAR", START_YEAR) 
 end_year = st.session_state.get("END_YEAR", END_YEAR)
+
 SYS_MSG_MANAGER_JUDGE = """
 You are the Manager of a prestigious investment judging team, tasked with evaluating and comparing investment decisions made by two investment houses.
 The investment houses had information up to {start_year}.
@@ -178,7 +179,7 @@ Your focus is not on the actual outcome (profit/loss), but on how well the decis
    - Identify any major blind spots.
    - Note if any step seemed skipped or rushed (e.g., liquidity not debated, no consensus).
 
-### In your response:
+In your response:
 - List strengths in their decision-making process.
 - List weaknesses or missing steps.
 - Conclude how complete and reliable their decision process was.
