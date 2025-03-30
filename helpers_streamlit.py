@@ -65,15 +65,15 @@ def start_fastapi_server():
 def initialize_session_state():
     """Ensures all session state variables are initialized."""
     st.session_state.setdefault("house1_messages", [])
-    st.session_state.setdefault("chat_messages_2", [])
-    st.session_state.setdefault("chat_messages_judges", [])
+    st.session_state.setdefault("house2_messages", [])
+    st.session_state.setdefault("judges_messages", [])
 
                     
 async def run_analysis(stocks, investment_budget, start_year, end_year, house1_chat, house2_chat, judges_chat, investment_house1, investment_house2, judges):
     """Runs AI analysis asynchronously with better UI updates."""
     st.session_state.house1_messages = []
-    st.session_state.chat_messages_2 = []
-    st.session_state.chat_messages_judges = []
+    st.session_state.house2_messages = []
+    st.session_state.judges_messages = []
     
     with house1_chat:
         st.write("Investment House 1 analysis in progress...")

@@ -135,7 +135,7 @@ async def init_investment_house_discussion(init_agents, stocks_symbol: list[str]
 
     chat_messages = st.session_state[chat_key] 
     print("\nStarting conversation:")
-    print("here2", flush =True)
+
     messages = []
     async for event in team.run_stream(task=initial_message):
         print("🎤 Got event from agent:", event)
