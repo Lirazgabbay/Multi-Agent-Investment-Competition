@@ -17,21 +17,43 @@ class InitJudgeAgent():
     def __init__(self):
         load_dotenv()
         api_key_open_AI = os.getenv('OPENAI_API_KEY')
-        api_key_gemini = os.getenv('GEMINI_API_KEY')
-        self.model_client = OpenAIChatCompletionClient(
-            model='gpt-3.5-turbo',
+        self.gpt4o_mini_model_client = OpenAIChatCompletionClient(
+            model='gpt-4o-mini', 
             api_key=api_key_open_AI,
+            temperature=0.3,
         )
-        self.gpt4_model_client = OpenAIChatCompletionClient(
+
+        self.gpt4o_model_client = OpenAIChatCompletionClient(
             model='gpt-4o', 
             api_key=api_key_open_AI,
             temperature=0.3,
         )
-        self.gemini_model_client = OpenAIChatCompletionClient(
-        model="gemini-1.5-flash-8b",  
-        api_key=api_key_gemini,
-        temperature=0.3,
+
+        api_key_openrouter = os.getenv('OPENROUTER_API_KEY')
+
+        self.gemini_model_client  = OpenAIChatCompletionClient(
+            model="google/gemini-2.0-flash-lite-001",
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key_openrouter,
+            temperature=0.3,
+            timeout=600,
+            extra_headers={
+                "HTTP-Referer": "http://localhost:8000",
+                "X-Title": "Investment Analysis App"
+            },
+            model_info={
+                "completion_parser": "openai",
+                "chat_parser": "openai",
+                "use_system_prompt": True,
+                "function_calling": False,
+                "supports_function_calling": False,
+                "supports_vision": False,
+                "vision": False,
+                "json_output": False,
+                "family": "gemini-2.0-flash-lite-001"
+            }
         )
+
 
         google_search_tool = FunctionTool(
             google_search, description="Search Google for information, returns results with a snippet and body content"
@@ -47,14 +69,15 @@ class InitJudgeAgent():
 
         self.summary_agent = AssistantAgent(
             name="Summary_Analyst",
-            model_client=self.model_client,
+            model_client=self.gemini_model_client,
             description="Provides a final summary of the discussion and consensus reached.",
-            system_message="Provide the consensus that the agents have reached and a short summary on the final decision."
+            system_message="Provide the consensus that the agents have reached and a short summary on the final decision.",
+            reflect_on_tool_use=False
         )
         
         self.manager_agent = AssistantAgent(
             name="Manager",
-            model_client=self.model_client,
+            model_client=self.gpt4o_model_client,
             description="Guides the discussion and ensures all perspectives are considered.",
             system_message=SYS_MSG_MANAGER_JUDGE,
             reflect_on_tool_use=True 
@@ -63,7 +86,7 @@ class InitJudgeAgent():
         self.profit_judge = AssistantAgent(
             name="Profit_Judge",
             tools=[judge_profit_tool],
-            model_client=self.model_client,
+            model_client=self.gpt4o_mini_model_client,
             description="Judges the profit of the stock in a defined period.",
             system_message=SYS_MSG_PROFIT_JUDGE,
             reflect_on_tool_use=True 
@@ -71,7 +94,7 @@ class InitJudgeAgent():
 
         self.web_surfer = AssistantAgent(
             name="Web_Surfer",
-            model_client=self.gpt4_model_client,
+            model_client=self.gpt4o_mini_model_client,
             tools=[google_search_tool],
             description="Surfs the web for information.",
             system_message=SYS_MSG_WEBSURFER_JUDGE,
@@ -86,7 +109,7 @@ class InitJudgeAgent():
 
         self.decision_quality_judge = AssistantAgent(
             name="Decision_Quality_Judge",
-            model_client=self.gpt4_model_client,
+            model_client=self.gpt4o_mini_model_client,
             tools=[get_discussion_tool],
             description="Judges the completeness and quality of the decision-making process in each investment house.",
             system_message=SYS_MSG_DECISION_QUALITY_JUDGE,
