@@ -7,17 +7,15 @@ This system explores collaborative intelligence using domain-specific roles, rea
 ## Overview
 This system simulates an AI-powered investment competition between two virtual investment houses. Each house consists of multiple agents with domain-specific roles who analyze data, discuss strategies, and make investment decisions.
 
-Inputs
-    - Budget
-    - Stock symbol
-    - Range of years for analysis
+### Inputs
+- Investment budget  
+- Stock symbol  
+- Range of years for historical analysis
 
-Outputs
-    - Investment House 1: Discussion and Final Decision
-    - Investment House 2: Discussion and Final Decision
-    - Judges Panel: Evaluation and Final Verdict
-
-All conversations are presented in real-time using a Streamlit interface.
+### Outputs
+- Investment House 1: Discussion and final investment decision  
+- Investment House 2: Discussion and final investment decision  
+- Judges Panel: Evaluation and final verdict on which house made the better decision
 
 ## AI Agent Roles
 ### Investment House Agents
