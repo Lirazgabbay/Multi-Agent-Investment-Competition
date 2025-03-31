@@ -10,8 +10,8 @@ import socket
 import psutil
 import streamlit as st
 from database.routes import app
-from group_chat import init_investment_house_discussion
-from group_chat_judges import init_judges_discussion
+from group_chats.group_chat import init_investment_house_discussion
+from group_chats.group_chat_judges import init_judges_discussion
 
 # init fastapi server
 def is_fastapi_running():
@@ -33,7 +33,7 @@ def run_fastapi():
     if not is_port_in_use(8000):
         uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
     else:
-        print("🚀 FastAPI is already running. Skipping startup.")
+        print("FastAPI is already running. Skipping startup.")
 
 
 def wait_for_fastapi():
@@ -43,13 +43,13 @@ def wait_for_fastapi():
         try:
             response = requests.get(url)
             if response.status_code == 200:
-                print("✅ FastAPI is ready!")
+                print("FastAPI is ready!")
                 return
         except requests.exceptions.ConnectionError:
             pass
-        print("⏳ Waiting for FastAPI to start...")
+        print("Waiting for FastAPI to start...")
         time.sleep(1)  
-    print("❌ FastAPI did not start in time. Exiting...")
+    print("FastAPI did not start in time. Exiting...")
     exit(1) 
 
 
