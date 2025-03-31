@@ -10,7 +10,7 @@ import pytest
 from unittest.mock import MagicMock
 from autogen_agentchat.messages import TextMessage
 from autogen_core import CancellationToken
-from init_agents import InitAgents
+from group_chats.init_agents import InitAgents
 from finance.LLM_get_financial import quick_ratio
 from finance.agents_functions import competative_func, historical_func, qualitative_func
 from autogen_core.tools import FunctionTool

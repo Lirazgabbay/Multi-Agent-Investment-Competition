@@ -1,0 +1,3 @@
+from .group_chat import init_investment_house_discussion
+from .group_chat_judges import init_judges_discussion
+

@@ -5,9 +5,9 @@ from helpers_streamlit import (
     start_analysis_thread,
     initialize_session_state
 )
-import init_agents
-import init_judge_agents
-from app_constants import BUDGET, TICKER_STOCKS, START_YEAR, END_YEAR
+import group_chats.init_agents as init_agents
+import group_chats.init_judge_agents as init_judge_agents
+from config.app_constants import BUDGET, TICKER_STOCKS, START_YEAR, END_YEAR
 
 init_db("stock_trading.db")
 start_fastapi_server()
