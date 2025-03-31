@@ -1,25 +1,20 @@
 """
-    LLM_get_qualitive.py - Functions for the qualitive Analyst agents
+LLM_get_qualitive.py - Functions for the qualitive Analyst agents
 """
-# import yfinance as yf
-import requests
-import os
-from dotenv import load_dotenv
 import json
 import streamlit as st
-
-from app_constants import START_YEAR
+from config.app_constants import START_YEAR
 from database.api_utils import cached_api_request
 
 def extract_business_info(symbol: str) -> dict:
     """
     Extracts strategic elements from company information using Polygon.io.
 
-    Args:
-        company_ticker (str): The stock ticker symbol.
+    args:
+        company_ticker (str): The stock ticker symbol
 
-    Returns:
-        dict: A dictionary containing a business summary of the company.
+    returns:
+        dict: A dictionary containing a business summary of the company
     """
     response_text = cached_api_request(
         url=f"https://api.polygon.io/v3/reference/tickers/{symbol}",
@@ -40,17 +35,16 @@ def extract_business_info(symbol: str) -> dict:
         return json.dumps({"error": f"Error processing API response: {str(e)}"})
 
 
-def get_company_data(symbol: str,year:int, limit: int = 2) -> dict:
+def get_company_data(symbol: str, limit: int = 2) -> dict:
     """
     Fetches recent news articles related to a company using Polygon.io API.
 
     Args:
-        ticker (str): The stock ticker symbol.
-        year ()
-        limit (int): The number of articles to retrieve (default: 2).
+        ticker (str): The stock ticker symbol
+        limit (int): The number of articles to retrieve (default: 2)
 
     Returns:
-        dict: A dictionary containing news articles related to the company.
+        dict: A dictionary containing news articles related to the company
     """
     start_year = st.session_state.get("START_YEAR", START_YEAR)
     response_text = cached_api_request(
@@ -60,7 +54,7 @@ def get_company_data(symbol: str,year:int, limit: int = 2) -> dict:
         api_key_param="apiKey",
         params={"ticker": symbol, "limit": limit}
     )
-    print(response_text)
+
     try:
         data = json.loads(response_text)
         news = data.get("results", [])

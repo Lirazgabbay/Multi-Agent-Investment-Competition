@@ -3,7 +3,7 @@ agents_functions.py
 This file contains wrapper functions that the agents will use to interact with the finance module. 
 These functions will be called by the agents to get financial data and perform analysis.
 """
-from app_constants import START_YEAR
+from config.app_constants import START_YEAR
 from finance.LLM_get_financial import get_related_companies
 from finance.LLM_get_qualitative import extract_business_info, get_company_data
 from finance.profit_margin import calculate_profit_margins
@@ -14,6 +14,10 @@ import streamlit as st
 def historical_func(symbols: list, years: List[int]):
     """
     receives a list of symbols and a list of years and returns a dictionary with the historical data for each symbol
+
+    Args:
+        symbols (List): symbols to get historical data for
+        years (List): years to get historical data for
 
     returns:
         results: dictionary with the historical data for each symbol
@@ -36,8 +40,12 @@ def competative_func(symbol: str, years: List[int]):
     """
     Receives a symbol and a list of years and returns a dictionary with the competitive data for the symbol.
 
+    Args:
+        symbol (str): symbol to get competitive data for
+        years (List): years to get competitive data for
+
     Returns:
-        results: dictionary with the competitive data for the symbol.
+        results: dictionary with the competitive data for the symbol
     """
     results = {}
     related_companies = get_related_companies(symbol)
@@ -67,6 +75,10 @@ def competative_func(symbol: str, years: List[int]):
 def qualitative_func(symbols: list, year: int = st.session_state.get("START_YEAR", START_YEAR)):
     """
     receives a list of symbols and returns a dictionary with the qualitative data for each symbol
+
+    Args:
+        symbols (List): symbols to get qualitative data for
+        year (int): year to get qualitative data for
     
     returns:
         results: dictionary with the qualitative data for each symbol

@@ -1,22 +1,19 @@
 """
     profit_margin.py - Functions to calculate profit margins for a company ticker symbol.
 """
-import os
-from dotenv import load_dotenv
-import requests
 import json
-
 from database.api_utils import cached_api_request
 
 def fetch_income_statement(symbol: str, year: int) -> dict: 
     """
     Fetches the income statement data for the given company ticker and year using the FMP API.
-    receive:
-        - symbol: The stock ticker symbol.
-        - year: The year for which the income statement data is requested.
 
-    returns:
-        - a dictionary containing the income statement data for the given year.
+    Args:
+        symbol (str): The stock ticker symbol
+        year (int): The year for which the income statement data is requested
+
+    Returns:
+        dict: dictionary containing the income statement data for the given year
     """
     response_text = cached_api_request(
         url=f"https://financialmodelingprep.com/api/v3/income-statement/{symbol}",
@@ -37,15 +34,17 @@ def fetch_income_statement(symbol: str, year: int) -> dict:
         print(f"Error processing API response: {str(e)}")
         return None
 
+
 def calculate_profit_margins(symbol: str, year: int) -> dict:
     """
     Calculates the profit margins for the given company ticker and year using the FMP API.
-    receive:
-        - symbol: The stock ticker symbol.
-        - year: The year for which the profit margins are calculated.
 
-    returns:
-        - a dictionary containing the profit margins for the given year.
+    Args:
+        symbol (str): The stock ticker symbol
+        year (int): The year for which the profit margins are calculated
+
+    Returns:
+        dict: dictionary containing the profit margins for the given year
     """
     data = fetch_income_statement(symbol, year)
     if data:

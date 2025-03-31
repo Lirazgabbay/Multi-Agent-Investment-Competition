@@ -10,11 +10,11 @@ def price_to_EBIT_ratio(symbol: str, year: int ) -> str:
     Calculate the Price/EBIT ratio for a given company symbol using FMP API.
 
     Args:
-        symbol (str): The stock ticker symbol (e.g., 'AAPL').
-        yesr (int): The fiscal year for which to calculate the ratio.
+        symbol (str): The stock ticker symbol (e.g., 'AAPL')
+        yesr (int): The fiscal year for which to calculate the ratio
 
     Returns:
-        str: The Price/EBIT ratio, or None if data is unavailable.
+        str: The Price/EBIT ratio, or None if data is unavailable
     """
     ebit = None 
     market_cap = None
@@ -114,7 +114,6 @@ def ratios(symbol: str, year:int) -> dict:
                         "price_to_sales_ratio": price_to_sales_ratio
                     }
                     return json.dumps(result)
-            print(f"No data returned for {symbol} in year {year}.")
             return None
     except json.JSONDecodeError:
         print("Failed to parse API response as JSON")

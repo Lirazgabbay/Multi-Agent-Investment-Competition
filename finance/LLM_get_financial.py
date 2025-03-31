@@ -1,22 +1,18 @@
 """
-    LLM_get_financial.py - Functions for the Analyst agents
+LLM_get_financial.py - Functions for the Analyst agents
 """
 import json
-import os
-from dotenv import load_dotenv
-import requests
 from database.api_utils import cached_api_request
-
 
 def quick_ratio(symbol: str, year: int) -> str:
     """
     Fetches the Quick Ratio (TTM) for the given company ticker using FMP API.
 
     Args:
-        ticker (str): The stock ticker symbol.
+        ticker (str): The stock ticker symbol
 
     Returns:
-        str: The Quick Ratio as a string, or an error message if unavailable.
+        str: The Quick Ratio as a string, or an error message if unavailable
     """
     response_text = cached_api_request(
         url=f"https://financialmodelingprep.com/api/v3/ratios/{symbol}",
@@ -37,19 +33,17 @@ def quick_ratio(symbol: str, year: int) -> str:
             return "No data returned for the specified ticker."
     except json.JSONDecodeError:
         return f"Failed to parse API response as JSON."
-    return None
-
 
 
 def get_related_companies(symbol: str, n: int = 1) -> list:
     """
     Fetch up to n related tickers for the given ticker from Polygon.io.
 
-    args: ticker: The stock symbol for which related tickers are requested (e.g., "AAPL").
-            n: The maximum number of related tickers to return.
-            api_key: Your Polygon.io API key.
+    Args: ticker: The stock symbol for which related tickers are requested (e.g., "AAPL")
+            n: The maximum number of related tickers to return
+            api_key: Your Polygon.io API key
 
-    return: A list of related ticker symbols.
+    Return: A list of related ticker symbols
     """
     response_text = cached_api_request(
         url=f"https://api.polygon.io/v1/related-companies/{symbol}",
